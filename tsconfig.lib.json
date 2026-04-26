@@ -1,0 +1,14 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["src/lib/**/*", "src/lib/**/*.vue"],
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.lib.tsbuildinfo",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

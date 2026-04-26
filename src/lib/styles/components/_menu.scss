@@ -1,0 +1,61 @@
+.vs-menu {
+  background: var(--vs-menu-bg);
+  border: var(--vs-border-width) solid var(--vs-border);
+  border-radius: var(--vs-radius);
+  box-shadow: var(--vs-shadow-menu);
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: var(--vs-z-menu);
+  animation: vs-menu-in 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 4px;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--vs-border);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--vs-border-hover);
+  }
+}
+
+.vs-menu__empty {
+  padding: 12px;
+  color: var(--vs-text-muted);
+  text-align: center;
+  font-size: 0.95em;
+}
+
+.vs-menu__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  color: var(--vs-text-muted);
+}
+
+.vs-menu__create {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--vs-radius-sm);
+  color: var(--vs-accent);
+  font-weight: 500;
+  cursor: pointer;
+  border-top: var(--vs-border-width) solid var(--vs-border);
+  margin-top: 4px;
+
+  &:hover {
+    background: var(--vs-accent-soft);
+  }
+
+  strong {
+    color: var(--vs-text);
+    font-weight: 600;
+  }
+}

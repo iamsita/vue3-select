@@ -1,0 +1,75 @@
+.vs-control {
+  display: flex;
+  align-items: center;
+  gap: var(--vs-gap);
+  width: 100%;
+  min-height: var(--vs-control-min-height);
+  padding: var(--vs-control-padding-y) var(--vs-control-padding-x);
+  background: var(--vs-bg);
+  border: var(--vs-border-width) solid var(--vs-border);
+  border-radius: var(--vs-radius);
+  color: var(--vs-text);
+  font-size: var(--vs-font-size);
+  line-height: var(--vs-line-height);
+  cursor: text;
+  transition:
+    border-color var(--vs-transition),
+    box-shadow var(--vs-transition),
+    background-color var(--vs-transition);
+
+  &:hover:not(.is-disabled) {
+    border-color: var(--vs-border-hover);
+  }
+
+  .vs--focused & {
+    border-color: var(--vs-border-focus);
+    box-shadow: var(--vs-focus-ring);
+  }
+
+  .vs--disabled & {
+    background: var(--vs-bg-disabled);
+    color: var(--vs-text-disabled);
+    cursor: not-allowed;
+  }
+
+  .vs--size-sm & {
+    min-height: var(--vs-control-min-height-sm);
+    font-size: var(--vs-font-size-sm);
+  }
+
+  .vs--size-lg & {
+    min-height: var(--vs-control-min-height-lg);
+    font-size: var(--vs-font-size-lg);
+  }
+}
+
+.vs-control__values {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vs-gap);
+  min-width: 0;
+}
+
+.vs-control__placeholder {
+  color: var(--vs-text-placeholder);
+  pointer-events: none;
+  user-select: none;
+}
+
+.vs-control__single {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vs-control__indicators {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  color: var(--vs-text-muted);
+}

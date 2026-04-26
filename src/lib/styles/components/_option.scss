@@ -1,0 +1,58 @@
+.vs-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--vs-radius-sm);
+  color: var(--vs-text);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--vs-transition), color var(--vs-transition);
+  font-size: var(--vs-font-size);
+  line-height: var(--vs-line-height);
+
+  &.is-active {
+    background: var(--vs-option-active-bg);
+  }
+
+  &.is-selected {
+    background: var(--vs-option-selected-bg);
+    color: var(--vs-option-selected-text);
+    font-weight: 500;
+  }
+
+  &.is-disabled {
+    color: var(--vs-text-disabled);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+.vs-option__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vs-option__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--vs-accent);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.vs-option__hint {
+  flex-shrink: 0;
+  color: var(--vs-text-muted);
+  font-size: 0.85em;
+}
