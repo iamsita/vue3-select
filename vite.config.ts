@@ -7,9 +7,9 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import dts from 'vite-plugin-dts'
 
-// `npm run build:lib` produces a publishable npm package; `npm run dev`
-// serves the playground in src/App.vue. One config covers both to keep
-// configuration in a single place.
+// `npm run build:lib` (BUILD_TARGET=lib) emits the publishable package;
+// `npm run dev` and `npm run build:demo` use the same config to drive the
+// playground at /playground/.
 const isLib = process.env.BUILD_TARGET === 'lib'
 
 export default defineConfig({
@@ -19,9 +19,10 @@ export default defineConfig({
     ...(isLib
       ? [
           dts({
-            include: ['src/lib/**/*.ts', 'src/lib/**/*.vue'],
+            include: ['src/**/*.ts', 'src/**/*.vue'],
+            exclude: ['playground/**/*', 'tests/**/*'],
             outDir: 'dist',
-            entryRoot: 'src/lib',
+            entryRoot: 'src',
             insertTypesEntry: true,
             tsconfigPath: './tsconfig.lib.json',
           }),
@@ -30,14 +31,15 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      '@/': fileURLToPath(new URL('./src/', import.meta.url)),
     },
   },
   ...(isLib
     ? {
         build: {
           lib: {
-            entry: resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/lib/index.ts'),
+            entry: resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/index.ts'),
             name: 'VueSelect',
             fileName: (format) => `vue3-select.${format === 'es' ? 'mjs' : 'cjs'}`,
             formats: ['es', 'cjs'] as const,
@@ -54,6 +56,7 @@ export default defineConfig({
                 if (assetInfo.name === 'style.css') return 'vue3-select.css'
                 return assetInfo.name ?? 'asset'
               },
+              exports: 'named',
             },
           },
           cssCodeSplit: false,

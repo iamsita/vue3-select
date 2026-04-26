@@ -1,8 +1,8 @@
 import { computed, ref, watch, type Ref } from 'vue'
-import type { NormalizedOption, SelectMode } from '../types'
-import { toggleValue, valuesEqual } from '../utils'
+import type { NormalizedOption, SelectMode } from '../types/option'
+import { toggleValue, valuesEqual } from '../core/compare'
 
-interface UseSelectOptions<T> {
+export interface UseSelectionOptions<T> {
   modelValue: Ref<unknown>
   options: Ref<NormalizedOption<T>[]>
   mode: Ref<SelectMode>
@@ -14,15 +14,14 @@ interface UseSelectOptions<T> {
 
 /**
  * Core selection state machine. Translates between the v-model shape (one
- * value vs an array) and the internal "list of selected normalised options"
- * the UI renders. We resolve selections from the option list so that, for
- * object options, the selection rendering survives a refresh of the same
- * value supplied by reference.
+ * value vs an array) and the internal list of selected normalised options
+ * the UI renders. We resolve selections against the option list so that, for
+ * object options, the rendered selection survives a referential refresh of
+ * the same value (e.g. async option list reloads).
  */
-export function useSelect<T>(opts: UseSelectOptions<T>) {
+export function useSelection<T>(opts: UseSelectionOptions<T>) {
   const isMulti = computed(() => opts.mode.value !== 'single')
 
-  /** modelValue normalised to an array regardless of mode. */
   const selectedValues = computed<unknown[]>(() => {
     const value = opts.modelValue.value
     if (value == null || value === '') return []
@@ -30,16 +29,19 @@ export function useSelect<T>(opts: UseSelectOptions<T>) {
   })
 
   /**
-   * Selected options resolved against the option list. We fall back to a
-   * synthetic option when a value has no matching entry — common while async
-   * options are still loading — so the UI stays consistent.
+   * If a value has no matching option (common during async loading) we
+   * synthesise a placeholder so the chip/label still renders.
    */
   const selectedOptions = computed<NormalizedOption<T>[]>(() => {
     return selectedValues.value.map((v) => {
       const found = opts.options.value.find((o) => valuesEqual(o.value, v))
       if (found) return found
       const label = typeof v === 'object' && v !== null
-        ? String((v as Record<string, unknown>).label ?? (v as Record<string, unknown>).name ?? '')
+        ? String(
+            (v as Record<string, unknown>).label
+              ?? (v as Record<string, unknown>).name
+              ?? '',
+          )
         : String(v)
       return {
         id: `synthetic-${label}`,
@@ -64,9 +66,10 @@ export function useSelect<T>(opts: UseSelectOptions<T>) {
     }
     const cap = opts.maxSelections?.value
     if (!isSelected(option) && cap !== undefined && selectedValues.value.length >= cap) return
+    const wasSelected = isSelected(option)
     const next = toggleValue(selectedValues.value, option.value)
     opts.emitUpdate(next)
-    if (isSelected(option)) opts.emitDeselect(option)
+    if (wasSelected) opts.emitDeselect(option)
     else opts.emitSelect(option)
   }
 
@@ -86,7 +89,6 @@ export function useSelect<T>(opts: UseSelectOptions<T>) {
     cleared.forEach((o) => opts.emitDeselect(o))
   }
 
-  /** Open/close + active descendant tracking. */
   const isOpen = ref(false)
   const activeIndex = ref(-1)
 
@@ -103,7 +105,7 @@ export function useSelect<T>(opts: UseSelectOptions<T>) {
     isOpen.value ? close() : open()
   }
 
-  /** Reset cursor when the visible list changes underneath us. */
+  /** Reset the highlight when the visible list changes underneath us. */
   watch(
     () => opts.options.value.length,
     () => {

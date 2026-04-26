@@ -1,0 +1,10 @@
+// Emerald accent preset. Apply by adding `vs--theme-emerald` to the root,
+// or include this file alongside `index.scss` to register globally.
+.vs--theme-emerald {
+  --vs-accent: #10b981;
+  --vs-accent-soft: #ecfdf5;
+  --vs-border-focus: #10b981;
+  --vs-option-selected-bg: #ecfdf5;
+  --vs-option-selected-text: #065f46;
+  --vs-focus-ring: 0 0 0 3px rgba(16, 185, 129, 0.18);
+}

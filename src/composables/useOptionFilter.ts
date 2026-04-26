@@ -1,8 +1,9 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
-import type { FilterFn, NormalizedOption } from '../types'
-import { defaultFilter } from '../utils'
+import type { FilterFn } from '../types/filter'
+import type { NormalizedOption } from '../types/option'
+import { defaultFilter } from '../core/filter'
 
-interface UseFilterOptions<T> {
+export interface UseOptionFilterOptions<T> {
   options: Ref<NormalizedOption<T>[]>
   query: Ref<string>
   filter?: FilterFn<T>
@@ -11,10 +12,10 @@ interface UseFilterOptions<T> {
 
 /**
  * Filters the option list against the active search query. Returns the
- * filtered list and a "would create" flag so the menu can offer the user a
- * "Create '<query>'" row when nothing matches and `taggable` is on.
+ * filtered list plus a `hasMatches` flag — useful for menu empty states and
+ * the "Create '<query>'" row when `taggable` is on.
  */
-export function useFilter<T>(opts: UseFilterOptions<T>): {
+export function useOptionFilter<T>(opts: UseOptionFilterOptions<T>): {
   filtered: ComputedRef<NormalizedOption<T>[]>
   hasMatches: ComputedRef<boolean>
 } {

@@ -1,0 +1,30 @@
+// Public stylesheet entry. Consumers import either the compiled CSS
+// (`@matat/vue3-select/style.css`) or this SCSS file via the `./scss`
+// subpath export to participate in their own design-token build.
+
+@use 'tokens' as tokens;
+@use 'base/animations';
+@use 'base/root';
+@use 'parts/control';
+@use 'parts/tag';
+@use 'parts/search';
+@use 'parts/indicator';
+@use 'parts/menu';
+@use 'parts/option';
+@use 'parts/group';
+
+// Default tokens applied to the component root. Scoped to `.vs` so the
+// custom properties don't leak into surrounding CSS systems.
+.vs {
+  @include tokens.tokens;
+}
+
+.vs--theme-dark {
+  @include tokens.dark-tokens;
+}
+
+@media (prefers-color-scheme: dark) {
+  .vs--theme-auto {
+    @include tokens.dark-tokens;
+  }
+}

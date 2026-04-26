@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
-import type { NormalizedOption } from '../types'
+import type { NormalizedOption } from '../types/option'
 
-interface UseKeyboardOptions<T> {
+export interface UseKeyboardNavOptions<T> {
   isOpen: Ref<boolean>
   activeIndex: Ref<number>
   options: Ref<NormalizedOption<T>[]>
@@ -19,7 +19,7 @@ interface UseKeyboardOptions<T> {
  * trigger button share the same key map — typing "ArrowDown" feels the same
  * regardless of which element holds focus.
  */
-export function useKeyboard<T>(opts: UseKeyboardOptions<T>) {
+export function useKeyboardNav<T>(opts: UseKeyboardNavOptions<T>) {
   function move(delta: number) {
     const visible = opts.options.value
     if (visible.length === 0) {

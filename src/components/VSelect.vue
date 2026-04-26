@@ -8,24 +8,31 @@ import {
   size as floatingSize,
   useFloating,
 } from '@floating-ui/vue'
+import type { NormalizedOption, OptionLike } from '../types/option'
+import type { VSelectProps } from '../types/props'
+import type { VSelectInstance } from '../types/emits'
 import type {
-  NormalizedOption,
-  OptionLike,
+  ClearSlotProps,
+  CreateSlotProps,
+  EmptySlotProps,
+  GroupSlotProps,
+  IndicatorSlotProps,
   OptionSlotProps,
   SelectionSlotProps,
-  VSelectComponentProps,
-  VSelectInstance,
-} from '../types'
-import { normalize } from '../utils'
-import { useFilter } from '../composables/useFilter'
-import { useId } from '../composables/useId'
-import { useKeyboard } from '../composables/useKeyboard'
-import { useSelect } from '../composables/useSelect'
-import { ChevronDownIcon, CheckIcon, CloseIcon } from './VSelectIcons'
+  SelectionTextSlotProps,
+} from '../types/slots'
+import { normalize } from '../core/normalize'
+import { useOptionFilter } from '../composables/useOptionFilter'
+import { useStableId } from '../composables/useStableId'
+import { useKeyboardNav } from '../composables/useKeyboardNav'
+import { useSelection } from '../composables/useSelection'
+import { ChevronDownIcon, CloseIcon } from './icons'
+import VSelectOption from './VSelectOption.vue'
+import VSelectTag from './VSelectTag.vue'
 
 defineOptions({ name: 'VSelect', inheritAttrs: false })
 
-const props = withDefaults(defineProps<VSelectComponentProps<T>>(), {
+const props = withDefaults(defineProps<VSelectProps<T>>(), {
   modelValue: undefined,
   options: () => [] as T[],
   mode: 'single',
@@ -69,7 +76,7 @@ const emit = defineEmits<{
   (e: 'search', query: string): void
 }>()
 
-const baseId = computed(() => props.id ?? useId('vs'))
+const baseId = computed(() => props.id ?? useStableId('vs'))
 const listboxId = computed(() => `${baseId.value}-listbox`)
 const searchId = computed(() => `${baseId.value}-search`)
 
@@ -107,7 +114,7 @@ const {
   open,
   close,
   toggle,
-} = useSelect<T>({
+} = useSelection<T>({
   modelValue: modelRef,
   options: normalizedOptions,
   mode: modeRef,
@@ -117,7 +124,7 @@ const {
   emitDeselect: (o) => emit('deselect', o as NormalizedOption<T>),
 })
 
-const { filtered } = useFilter<T>({
+const { filtered } = useOptionFilter<T>({
   options: normalizedOptions,
   query,
   caseSensitive: computed(() => props.caseSensitive),
@@ -160,7 +167,7 @@ function deselectLast() {
   if (last) deselect(last)
 }
 
-const { onKeydown } = useKeyboard<T>({
+const { onKeydown } = useKeyboardNav<T>({
   isOpen,
   activeIndex,
   options: filtered,
@@ -298,9 +305,7 @@ function onClearClick(event: MouseEvent) {
   if (props.searchable && searchEl.value) searchEl.value.focus()
 }
 
-function onTagRemove(option: NormalizedOption<T>, event: MouseEvent) {
-  event.preventDefault()
-  event.stopPropagation()
+function onTagRemove(option: NormalizedOption<T>) {
   deselect(option)
 }
 
@@ -401,20 +406,21 @@ watch(
   { immediate: true },
 )
 
-// Slot prop bag — exposed via type for IDE autocomplete on consumer side.
+// Slot prop bag — typed via the public slot interfaces so consumers get
+// IDE autocomplete on every override.
 defineSlots<{
   prepend?: () => unknown
   append?: () => unknown
   selection?: (props: SelectionSlotProps<T>) => unknown
-  'selection-text'?: (props: { selected: NormalizedOption<T>[] }) => unknown
+  'selection-text'?: (props: SelectionTextSlotProps<T>) => unknown
   option?: (props: OptionSlotProps<T>) => unknown
-  'group-label'?: (props: { group: string }) => unknown
-  'no-options'?: (props: { query: string }) => unknown
-  'no-results'?: (props: { query: string }) => unknown
+  'group-label'?: (props: GroupSlotProps) => unknown
+  'no-options'?: (props: EmptySlotProps) => unknown
+  'no-results'?: (props: EmptySlotProps) => unknown
   loading?: () => unknown
-  indicator?: (props: { open: boolean }) => unknown
-  clear?: (props: { clear: () => void }) => unknown
-  create?: (props: { query: string; create: () => void }) => unknown
+  indicator?: (props: IndicatorSlotProps) => unknown
+  clear?: (props: ClearSlotProps) => unknown
+  create?: (props: CreateSlotProps) => unknown
 }>()
 </script>
 
@@ -454,19 +460,11 @@ defineSlots<{
               :remove="() => deselect(option)"
               :disabled="disabled"
             >
-              <span class="vs-tag" :data-value="String(option.value)">
-                <span class="vs-tag__label">{{ option.label }}</span>
-                <button
-                  v-if="!disabled"
-                  type="button"
-                  class="vs-tag__remove"
-                  :aria-label="`Remove ${option.label}`"
-                  tabindex="-1"
-                  @mousedown="onTagRemove(option, $event)"
-                >
-                  <CloseIcon />
-                </button>
-              </span>
+              <VSelectTag
+                :option="option"
+                :disabled="disabled"
+                @remove="onTagRemove"
+              />
             </slot>
           </template>
           <span v-if="overflowTagCount > 0" class="vs-tag vs-tag--overflow">
@@ -606,34 +604,19 @@ defineSlots<{
                 {{ row.group }}
               </slot>
             </div>
-            <div
+            <VSelectOption
               v-else
-              :id="`${baseId}-opt-${row.option!.id}`"
-              class="vs-option"
-              role="option"
-              :class="{
-                'is-active': activeIndex === row.index,
-                'is-selected': isSelected(row.option!),
-                'is-disabled': row.option!.disabled,
-              }"
-              :aria-selected="isSelected(row.option!)"
-              :aria-disabled="row.option!.disabled || undefined"
-              @mousemove="activeIndex = row.index!"
-              @mousedown="onOptionMousedown($event, row.option!)"
+              :option="row.option!"
+              :selected="isSelected(row.option!)"
+              :active="activeIndex === row.index"
+              :dom-id="`${baseId}-opt-${row.option!.id}`"
+              @highlight="activeIndex = row.index!"
+              @pick="(opt, ev) => onOptionMousedown(ev, opt)"
             >
-              <slot
-                name="option"
-                :option="row.option!"
-                :selected="isSelected(row.option!)"
-                :active="activeIndex === row.index"
-                :disabled="row.option!.disabled || false"
-              >
-                <span class="vs-option__label">{{ row.option!.label }}</span>
-                <span v-if="isSelected(row.option!)" class="vs-option__check">
-                  <CheckIcon />
-                </span>
-              </slot>
-            </div>
+              <template v-if="$slots.option" #default="slotProps">
+                <slot name="option" v-bind="slotProps" />
+              </template>
+            </VSelectOption>
           </template>
         </template>
 

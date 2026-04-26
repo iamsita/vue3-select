@@ -1,6 +1,7 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["src/lib/**/*", "src/lib/**/*.vue"],
+  "include": ["src/**/*", "src/**/*.vue"],
+  "exclude": ["playground/**/*", "tests/**/*"],
   "compilerOptions": {
     "noUncheckedIndexedAccess": true,
     "declaration": true,
