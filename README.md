@@ -386,4 +386,4 @@ npm run build        # type-check + lib build → dist/
 npm run build:demo   # static playground build
 ```
 
-## License
+## Licenses
