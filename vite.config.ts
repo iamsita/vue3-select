@@ -51,6 +51,9 @@ export default defineConfig({
       '@/': fileURLToPath(new URL('./src/', import.meta.url)),
     },
   },
+  // The lib build must not copy `public/` into `dist/` — that's the dev
+  // server's favicon, and it would otherwise ship inside the tarball.
+  publicDir: false,
   build: {
     lib: {
       entry: resolve(fileURLToPath(new URL('.', import.meta.url)), 'src/index.ts'),

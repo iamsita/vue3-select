@@ -78,7 +78,12 @@ const emit = defineEmits<{
   (e: 'search', query: string): void
 }>()
 
-const baseId = computed(() => props.id ?? useStableId('vselect'))
+// Resolve once in setup — `useStableId` calls `getCurrentInstance()`, which
+// returns null inside a computed getter, so wrapping this in `computed` would
+// produce a fresh anonymous-counter id on every re-evaluation and detach the
+// aria wiring (listbox / activedescendant) from the rendered DOM ids.
+const fallbackId = useStableId('vselect')
+const baseId = computed(() => props.id ?? fallbackId)
 const listboxId = computed(() => `${baseId.value}-listbox`)
 const searchId = computed(() => `${baseId.value}-search`)
 

@@ -8,6 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // The library build lives in `vite.config.ts` — kept separate so neither
 // file mixes "what we ship" with "how we test what we ship".
 export default defineConfig({
+  base: process.env.BASE_URL ?? '/',
   plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
