@@ -1,4 +1,3 @@
-
 export const fruits = ['Apple', 'Banana', 'Cherry', 'Durian', 'Elderberry', 'Fig', 'Grape']
 
 export interface Country {

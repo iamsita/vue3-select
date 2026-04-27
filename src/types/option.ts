@@ -1,5 +1,3 @@
-
-
 export interface NormalizedOption<T = unknown> {
   id: string
   value: unknown
