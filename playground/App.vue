@@ -42,26 +42,26 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
 
       <div class="single-row">
         <MultiExample :theme="theme" />
-        </div>
-
-      <div class="single-row">
-      <TagsExample :theme="theme" />
       </div>
 
       <div class="single-row">
-      <AsyncExample :theme="theme" />
+        <TagsExample :theme="theme" />
       </div>
 
       <div class="single-row">
-      <CustomSlotExample :theme="theme" />
+        <AsyncExample :theme="theme" />
       </div>
 
       <div class="single-row">
-      <SizesExample :theme="theme" />
+        <CustomSlotExample :theme="theme" />
       </div>
 
       <div class="single-row">
-      <TreeExample :theme="theme" />
+        <SizesExample :theme="theme" />
+      </div>
+
+      <div class="single-row">
+        <TreeExample :theme="theme" />
       </div>
     </section>
 
