@@ -76,9 +76,9 @@ CI runs all of the above automatically on every PR.
 ## Commits
 
 We use [Conventional Commits](https://www.conventionalcommits.org/), enforced
-by `commitlint` both locally (via `simple-git-hooks` on `commit-msg`) and in
-CI (`.github/workflows/commitlint.yml` lints every commit on the PR plus the
-PR title).
+by `commitlint` both locally (via [Husky](https://typicode.github.io/husky/)
+on `commit-msg`) and in CI (`.github/workflows/commitlint.yml` lints every
+commit on the PR plus the PR title).
 
 Format:
 
@@ -131,8 +131,30 @@ bumps can be derived mechanically (we'll likely add `release-please` or
 `changesets` next), and the `master` git log reads as a coherent
 spec-revision document.
 
-Hooks install automatically on `npm install` via the `prepare` script. To
-re-install manually: `npx simple-git-hooks`.
+## Git hooks
+
+Husky installs hooks automatically on `npm install` via the `prepare` script.
+Two hooks fire locally:
+
+- **`pre-commit`** runs `npm run lint` (oxlint + cached eslint — typically
+  under 1 s). Skip with `git commit --no-verify` for WIP commits.
+- **`commit-msg`** runs `commitlint --edit` against your message. There's no
+  bypass for this one because the CI workflow lints every commit on the PR
+  anyway — skipping locally just means failing later.
+
+To reinstall the hooks (e.g. if you cloned with `npm ci --ignore-scripts`):
+
+```bash
+npx husky
+```
+
+Hook scripts live in `.husky/`:
+
+```
+.husky/
+├── pre-commit       # npm run lint
+└── commit-msg       # npx commitlint --edit "$1"
+```
 
 ## Releasing (maintainers only)
 
