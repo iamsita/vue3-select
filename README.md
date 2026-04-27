@@ -192,6 +192,51 @@ import {
 } from 'vue3-select'
 ```
 
+## Nuxt 3 / 4
+
+`vue3-select` ships a first-class Nuxt module. Add it to `nuxt.config.ts`:
+
+```ts
+export default defineNuxtConfig({
+  modules: ['vue3-select/nuxt'],
+})
+```
+
+That's it — `<VSelect>` and `<VTreeSelect>` are auto-imported as global
+components and the stylesheet is injected. SSR is supported out of the box;
+the menu mounts to the DOM client-side via `<Teleport>` when configured.
+
+Module options live under `vue3Select`:
+
+```ts
+export default defineNuxtConfig({
+  modules: ['vue3-select/nuxt'],
+  vue3Select: {
+    /** Disable to keep tree-shaken named imports only. Default: true */
+    components: true,
+    /** Prefix the auto-registered tags — e.g. 'My' → <MySelect /> */
+    prefix: '',
+    /** Auto-import the headless composables too. Default: false */
+    composables: false,
+    /** Inject 'vue3-select/style.css' into Nuxt's CSS array. Default: true */
+    css: true,
+  },
+})
+```
+
+If you'd rather skip the module and wire it up by hand, drop a Nuxt plugin
+file in `plugins/`:
+
+```ts
+// plugins/vue3-select.ts
+import { VueSelectPlugin } from 'vue3-select'
+import 'vue3-select/style.css'
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.use(VueSelectPlugin)
+})
+```
+
 ## API
 
 ### Props
@@ -327,6 +372,7 @@ Modern evergreen browsers. ES2020 baseline. SSR friendly (no DOM access at modul
 ```bash
 npm install
 npm run dev          # playground at http://localhost:5173
+npm run dev -- --host 0.0.0.0 --port 5173
 npm run test         # vitest
 npm run build        # type-check + lib build → dist/
 npm run build:demo   # static playground build

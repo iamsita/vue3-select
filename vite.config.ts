@@ -41,8 +41,16 @@ export default defineConfig({
 
   build: {
     lib: {
-      entry: here('./src/index.ts'),
-      fileName: (format) => `vue3-select.${format === 'es' ? 'mjs' : 'cjs'}`,
+      // Two entries: the main library and a Nuxt module. The Nuxt module is
+      // built as its own chunk so consumers can register it via
+      // `modules: ['vue3-select/nuxt']` without pulling Nuxt into the main
+      // bundle.
+      entry: {
+        'vue3-select': here('./src/index.ts'),
+        nuxt: here('./src/nuxt.ts'),
+      },
+      fileName: (format, entryName) =>
+        `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,
       formats: ['es', 'cjs'],
     },
 
@@ -51,9 +59,10 @@ export default defineConfig({
     cssCodeSplit: false,
 
     rollupOptions: {
-      // Externalise both the Vue peer and the floating-ui dep so the
-      // consumer's package manager resolves them — never inline a peer.
-      external: ['vue', '@floating-ui/vue'],
+      // Externalise the Vue peer, the floating-ui dep, and the Nuxt-only
+      // build deps so consumers' package managers resolve them — never
+      // inline a peer, and never bundle Nuxt internals into the library.
+      external: ['vue', '@floating-ui/vue', '@nuxt/kit', '@nuxt/schema', 'nuxt'],
       output: {
         globals: { vue: 'Vue', '@floating-ui/vue': 'FloatingUIVue' },
         assetFileNames: (asset) => {
