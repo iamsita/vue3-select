@@ -16,6 +16,8 @@
   "main": "./dist/vue3-select.cjs",
   "module": "./dist/vue3-select.mjs",
   "types": "./dist/src/index.d.ts",
+  "unpkg": "./dist/vue3-select.mjs",
+  "jsdelivr": "./dist/vue3-select.mjs",
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -51,7 +53,10 @@
     "a11y",
     "headless",
     "form",
-    "dropdown"
+    "dropdown",
+    "tree",
+    "tree-select",
+    "treeselect"
   ],
   "scripts": {
     "dev": "vite --config vite.config.dev.ts",
@@ -71,7 +76,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "provenance": false
+    "provenance": true
   },
   "dependencies": {
     "@floating-ui/vue": "^1.0.0"

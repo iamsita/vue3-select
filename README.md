@@ -4,21 +4,21 @@ A typed, accessible, headless-friendly select for Vue 3.
 Single, multi, tags, async, grouped — one component, zero surprises.
 
 [![npm](https://img.shields.io/npm/v/vue3-select.svg)](https://www.npmjs.com/package/vue3-select)
-[![bundle](https://img.shields.io/badge/bundle-6.3kb%20gz-blue)](#)
+[![bundle](https://img.shields.io/badge/bundle-~10.7kb%20gz-blue)](#)
 [![types](https://img.shields.io/badge/types-included-3178c6)](#)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 - ✅ Vue 3 + TypeScript with full generics over your option type
 - ✅ Single, multiple, and tags modes (with create-on-Enter)
-- ✅ Searchable with custom filter functions
-- ✅ Async-friendly (`@search` + `:loading`)
+- ✅ Tree variant `<VTreeSelect>` with tri-state parents, search, "select all"
+- ✅ Searchable with custom filter functions, debouncing, async loading
 - ✅ Grouped options
 - ✅ Floating-UI menu positioning + Teleport support
-- ✅ ARIA-1.2 combobox + listbox semantics, full keyboard nav
+- ✅ ARIA-1.2 combobox + listbox / treeitem semantics, full keyboard nav
 - ✅ Themeable via CSS custom properties (light / dark / preset accents)
 - ✅ Native `<form>` integration via `name` prop
 - ✅ Tree-shakeable named exports + headless composables
-- ✅ ~6.3 kB gz JS · ~2.1 kB gz CSS · zero runtime deps beyond `@floating-ui/vue`
+- ✅ ~10.7 kB gz JS · ~2.8 kB gz CSS · zero runtime deps beyond `@floating-ui/vue`
 
 ---
 
@@ -138,13 +138,58 @@ async function onSearch(q: string) {
 </VSelect>
 ```
 
+### Tree select
+
+`<VTreeSelect>` mirrors the API surface of `<VSelect>` but renders a
+hierarchy with tri-state parents. Only **leaf** values flow through v-model —
+parent state is always derived, so you never have to reconcile it manually.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { VTreeSelect } from 'vue3-select'
+
+interface Cat { id: number; name: string; children: Cat[] }
+const categories: Cat[] = [
+  {
+    id: 1,
+    name: 'Web',
+    children: [
+      { id: 2, name: 'CSS', children: [] },
+      { id: 3, name: 'JS', children: [] },
+    ],
+  },
+  { id: 9, name: 'DevOps', children: [{ id: 10, name: 'Docker', children: [] }] },
+]
+const picked = ref<number[]>([])
+</script>
+
+<template>
+  <VTreeSelect
+    v-model="picked"
+    :options="categories"
+    option-value="id"
+    option-label="name"
+    default-expand-all
+  />
+</template>
+```
+
 ### Headless usage
 
-The composables that power `<VSelect>` are exported individually. Build your
-own UI on top:
+The composables that power `<VSelect>` and `<VTreeSelect>` are exported
+individually. Build your own UI on top:
 
 ```ts
-import { useSelection, useOptionFilter, useKeyboardNav, normalize } from 'vue3-select'
+import {
+  useSelection,
+  useTreeSelection,
+  useOptionFilter,
+  useKeyboardNav,
+  useDebounced,
+  normalize,
+  normalizeTree,
+} from 'vue3-select'
 ```
 
 ## API
@@ -213,8 +258,23 @@ import { useSelection, useOptionFilter, useKeyboardNav, normalize } from 'vue3-s
 
 ```ts
 const sel = ref<VSelectInstance>()
-sel.value?.open() // close, toggle, focus, blur, clear, isOpen
+sel.value?.open() // close, toggle, focus, blur, clear, flushSearch, isOpen
 ```
+
+### `<VTreeSelect>` props (additions)
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `optionChildren` | `keyof T \| (o: T) => T[]` | `'children'` | Children-array accessor |
+| `defaultExpandAll` | `boolean` | `false` | Expand every parent on first render |
+| `showToolbar` | `boolean` | `true` | Show "select all" / "clear" actions |
+| `closeOnSelect` | `boolean` | `false` | Close after every toggle (rarely useful) |
+
+`<VTreeSelect>` shares `placeholder`, `searchable`, `clearable`, `disabled`,
+`maxSelections`, `maxVisibleTags`, `debounce`, `emptyText`, `noResultsText`,
+`size`, `theme`, `ariaLabel`, `teleportTo`, and `id` with `<VSelect>`. It
+emits `update:modelValue`, `update:search`, `select`, `deselect`, `expand`,
+`collapse`, `search`, `open`, and `close`.
 
 ## Theming
 

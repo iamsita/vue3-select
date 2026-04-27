@@ -103,10 +103,8 @@ const debounceMs = computed(() => props.debounce)
 const {
   debounced: effectiveQuery,
   flush: flushSearch,
-  cancel: cancelSearch,
   force: forceSearch,
 } = useDebounced(query, debounceMs)
-void cancelSearch
 
 const focused = ref(false)
 
@@ -223,9 +221,18 @@ const { floatingStyles, update: updateFloating } = useFloating(controlEl, menuEl
   whileElementsMounted: (...args) => autoUpdate(...args, { animationFrame: false }),
 })
 
+function onDocumentPointerDown(event: PointerEvent) {
+  if (!isOpen.value) return
+  const target = event.target as Node
+  if (rootEl.value?.contains(target)) return
+  if (menuEl.value?.contains(target)) return
+  close()
+}
+
 watch(isOpen, (open) => {
   if (open) {
     emit('open')
+    document.addEventListener('pointerdown', onDocumentPointerDown, true)
     nextTick(() => {
       if (props.searchable && searchEl.value) searchEl.value.focus()
       if (activeIndex.value === -1 && filtered.value.length > 0) {
@@ -234,6 +241,7 @@ watch(isOpen, (open) => {
       if (useFloatingMenu.value) updateFloating()
     })
   } else {
+    document.removeEventListener('pointerdown', onDocumentPointerDown, true)
     emit('close')
   }
 })
@@ -249,19 +257,6 @@ watch(effectiveQuery, (q) => {
   })
 })
 
-function onDocumentPointerDown(event: PointerEvent) {
-  if (!isOpen.value) return
-  const target = event.target as Node
-  if (rootEl.value?.contains(target)) return
-  if (menuEl.value?.contains(target)) return
-  close()
-}
-
-watch(isOpen, (open) => {
-  if (open) document.addEventListener('pointerdown', onDocumentPointerDown, true)
-  else document.removeEventListener('pointerdown', onDocumentPointerDown, true)
-})
-
 onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', onDocumentPointerDown, true)
 })
@@ -269,9 +264,12 @@ onBeforeUnmount(() => {
 function onControlMousedown(event: MouseEvent) {
   if (props.disabled) return
   const target = event.target as HTMLElement
-  // Internal controls (clear button, tag remove, chevron) handle their own
-  // clicks — never let those pathways toggle the menu.
-  if (target.closest('.vselect-tag-remove, .vselect-indicator')) return
+  // Tag-remove buttons handle their own clicks and stop propagation, but
+  // guard anyway in case a custom tag slot forgets to.
+  if (target.closest('.vselect-tag-remove')) return
+  // Clear button is `.vselect-indicator` too, but stops propagation in its
+  // own mousedown handler — so events reaching here from an indicator are
+  // always the chevron, which should toggle the menu.
 
   // Clicking the search input *should* open the menu (it currently doesn't,
   // which makes the trigger feel half-broken in single mode where the input

@@ -22,23 +22,23 @@ export interface UseKeyboardNavOptions<T> {
 export function useKeyboardNav<T>(opts: UseKeyboardNavOptions<T>) {
   function move(delta: number) {
     const visible = opts.options.value
-    if (visible.length === 0) {
+    const len = visible.length
+    if (len === 0) {
       opts.activeIndex.value = -1
       return
     }
-    const enabledIndices = visible.map((o, i) => (o.disabled ? -1 : i)).filter((i) => i >= 0)
-    if (enabledIndices.length === 0) return
-
-    const current = opts.activeIndex.value
-    const currentPos = enabledIndices.indexOf(current)
-    let nextPos: number
-    if (currentPos === -1) {
-      nextPos = delta > 0 ? 0 : enabledIndices.length - 1
-    } else {
-      nextPos = (currentPos + delta + enabledIndices.length) % enabledIndices.length
+    // Step from the current position until we land on an enabled option,
+    // or fail after one full lap. Avoids allocating a per-keypress index
+    // map — large option lists hit this on every Arrow press.
+    let i = opts.activeIndex.value
+    if (i < 0) i = delta > 0 ? -1 : len
+    for (let step = 0; step < len; step += 1) {
+      i = (i + delta + len) % len
+      if (!visible[i]!.disabled) {
+        opts.activeIndex.value = i
+        return
+      }
     }
-    const next = enabledIndices[nextPos]
-    if (next !== undefined) opts.activeIndex.value = next
   }
 
   function onKeydown(event: KeyboardEvent) {

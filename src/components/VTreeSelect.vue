@@ -11,7 +11,6 @@ import {
 import type { OptionAccessor } from '../types/option'
 import type {
   NormalizedTreeNode,
-  TreeNodeCheckState,
   TreeOptionLike,
   VTreeSelectInstance,
   VTreeSelectProps,
@@ -138,15 +137,14 @@ watch(effectiveQuery, (q) => {
 const modelRef = computed(() => props.modelValue)
 const maxSelectionsRef = computed(() => props.maxSelections)
 
-const { selectedValues, isLeafSelected, getCheckState, toggle, selectAll, clear } =
-  useTreeSelection<T>({
-    modelValue: modelRef,
-    tree,
-    maxSelections: maxSelectionsRef,
-    emitUpdate: (v) => emit('update:modelValue', v),
-    emitSelect: (n) => emit('select', n),
-    emitDeselect: (n) => emit('deselect', n),
-  })
+const { selectedValues, getCheckState, toggle, selectAll, clear } = useTreeSelection<T>({
+  modelValue: modelRef,
+  tree,
+  maxSelections: maxSelectionsRef,
+  emitUpdate: (v) => emit('update:modelValue', v),
+  emitSelect: (n) => emit('select', n),
+  emitDeselect: (n) => emit('deselect', n),
+})
 
 // Lookup of every leaf node in the current tree, by value. Lets us render
 // labels in the trigger area without re-walking the tree on every paint.
@@ -340,11 +338,6 @@ defineExpose<VTreeSelectInstance>({
     return isOpen.value
   },
 })
-
-// Keep the unused-import lint quiet — `isLeafSelected` is exposed for users
-// of the headless composable directly, not consumed inside the SFC.
-void isLeafSelected
-void getCheckState as unknown as (n: NormalizedTreeNode<T>) => TreeNodeCheckState
 </script>
 
 <template>
