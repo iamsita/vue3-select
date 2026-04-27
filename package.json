@@ -2,15 +2,15 @@
   "name": "vue3-select",
   "version": "0.1.0",
   "description": "A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags, async, grouped — one component, zero surprises.",
-  "author": "Matat <hello@matat.io>",
+  "author": "Er. Anil Kumar Thakur <anilkumarthakur60@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/matat/vue3-select#readme",
+  "homepage": "https://github.com/anilkumarthakur60/vue3-select#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matat/vue3-select.git"
+    "url": "git+https://github.com/anilkumarthakur60/vue3-select.git"
   },
   "bugs": {
-    "url": "https://github.com/matat/vue3-select/issues"
+    "url": "https://github.com/anilkumarthakur60/vue3-select/issues"
   },
   "type": "module",
   "main": "./dist/vue3-select.cjs",
