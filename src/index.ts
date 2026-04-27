@@ -5,6 +5,8 @@
 export { default as VSelect } from '@/components/VSelect.vue'
 export { default as VSelectOption } from '@/components/VSelectOption.vue'
 export { default as VSelectTag } from '@/components/VSelectTag.vue'
+export { default as VTreeSelect } from '@/components/VTreeSelect.vue'
+export { default as VTreeSelectNode } from '@/components/VTreeSelectNode.vue'
 export * from '@/components/icons'
 
 // Plugin
@@ -16,9 +18,12 @@ export {
   useOptionFilter,
   useKeyboardNav,
   useStableId,
+  useTreeSelection,
   type UseSelectionOptions,
   type UseOptionFilterOptions,
   type UseKeyboardNavOptions,
+  type UseTreeSelectionOptions,
+  type UseTreeSelectionReturn,
 } from '@/composables'
 
 // Core helpers — useful for custom filter functions and option pre-processing.
@@ -30,6 +35,13 @@ export {
   valuesEqual,
   readAccessor,
   isPrimitive,
+  // Tree helpers
+  normalizeTree,
+  walkTree,
+  flattenTree,
+  filterTree,
+  getLeafValues,
+  getAncestorIds,
 } from '@/core'
 
 // Types
@@ -54,4 +66,11 @@ export type {
   ClearIconSlotProps,
   DropdownIconSlotProps,
   LoaderSlotProps,
+  // Tree types
+  NormalizedTreeNode,
+  TreeOptionLike,
+  TreeChildrenAccessor,
+  TreeNodeCheckState,
+  VTreeSelectProps,
+  VTreeSelectInstance,
 } from '@/types'

@@ -2,3 +2,8 @@ export { useSelection, type UseSelectionOptions } from '@/composables/useSelecti
 export { useOptionFilter, type UseOptionFilterOptions } from '@/composables/useOptionFilter'
 export { useKeyboardNav, type UseKeyboardNavOptions } from '@/composables/useKeyboardNav'
 export { useStableId } from '@/composables/useStableId'
+export {
+  useTreeSelection,
+  type UseTreeSelectionOptions,
+  type UseTreeSelectionReturn,
+} from '@/composables/useTreeSelection'

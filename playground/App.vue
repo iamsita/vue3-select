@@ -6,6 +6,7 @@ import TagsExample from './examples/TagsExample.vue'
 import AsyncExample from './examples/AsyncExample.vue'
 import CustomSlotExample from './examples/CustomSlotExample.vue'
 import SizesExample from './examples/SizesExample.vue'
+import TreeExample from './examples/TreeExample.vue'
 
 const theme = ref<'light' | 'dark' | 'auto'>('light')
 const themeBg = computed(() => (theme.value === 'dark' ? '#0b1220' : '#f8fafc'))
@@ -41,6 +42,7 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
       <AsyncExample :theme="theme" />
       <CustomSlotExample :theme="theme" />
       <SizesExample :theme="theme" />
+      <TreeExample :theme="theme" />
     </section>
 
     <footer>

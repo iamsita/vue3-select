@@ -18,13 +18,15 @@ export default defineConfig({
   plugins: [vue(), vueDevTools()],
 
   resolve: {
-    alias: {
-      // The playground imports from `@` as if it were a downstream consumer,
-      // resolving directly to the public package entry. The trailing-slash
-      // alias keeps deep imports routable for ad-hoc internal debugging.
-      '@': here('./src/index.ts'),
-      '@/': here('./src/'),
-    },
+    // Array form is required here because we have two overlapping aliases:
+    // bare `@` (the package entry) and `@/foo` (deep paths into src). Vite's
+    // object-form alias matches purely by prefix and would let `@` swallow
+    // `@/components/...` before the longer alias gets a chance, producing
+    // `src/index.ts/components/...` and a "file does not exist" error.
+    alias: [
+      { find: /^@\/(.*)$/, replacement: here('./src/$1') },
+      { find: /^@$/, replacement: here('./src/index.ts') },
+    ],
   },
 
   server: {

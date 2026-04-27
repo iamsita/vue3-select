@@ -1,4 +1,6 @@
 export { default as VSelect } from '@/components/VSelect.vue'
 export { default as VSelectOption } from '@/components/VSelectOption.vue'
 export { default as VSelectTag } from '@/components/VSelectTag.vue'
+export { default as VTreeSelect } from '@/components/VTreeSelect.vue'
+export { default as VTreeSelectNode } from '@/components/VTreeSelectNode.vue'
 export * from '@/components/icons'
