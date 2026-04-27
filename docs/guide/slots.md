@@ -55,6 +55,30 @@ const skills = ref(['Vue', 'TypeScript'])
   <div class="demo-meta">Selected: <code>{{ JSON.stringify(country) }}</code></div>
 </div>
 
+## Checkbox-style options
+
+A common multi-select skin — a leading checkbox per row instead of the
+default trailing check glyph:
+
+```vue
+<VSelect v-model="picked" mode="multiple" :options="opts">
+  <template #option="{ option, selected }">
+    <input
+      type="checkbox"
+      :checked="selected"
+      tabindex="-1"
+      readonly
+      style="margin-right: 8px; pointer-events: none;"
+    />
+    {{ option.label }}
+  </template>
+</VSelect>
+```
+
+The row already handles toggle, so `pointer-events: none` on the input
+prevents a double-toggle. See [Multi Select → Checkbox-style menu](./multi-select#checkbox-style-menu)
+for a live demo and the rationale behind each detail.
+
 ## Custom tags
 
 Replace per-tag rendering in multi / tags mode:

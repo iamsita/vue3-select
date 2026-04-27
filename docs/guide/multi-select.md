@@ -21,9 +21,10 @@ const skills = ref<string[]>([])
 
 <script setup lang="ts">
 import { ref } from 'vue'
-const skills = ref([])
-const overflow = ref(['TypeScript', 'Vue', 'React', 'Svelte'])
-const capped = ref([])
+const skills = ref<string[]>([])
+const overflow = ref<string[]>(['TypeScript', 'Vue', 'React', 'Svelte'])
+const capped = ref<string[]>([])
+const checkbox = ref<string[]>(['Push'])
 </script>
 
 <div class="demo" style="max-width: 480px;">
@@ -89,3 +90,71 @@ to grab another one). Override with `:close-on-select="true"`:
 ```vue
 <VSelect v-model="x" mode="multiple" :options="opts" :close-on-select="true" />
 ```
+
+## Checkbox-style menu
+
+Out of the box, selected options get a check glyph on the right of the row.
+Some designs prefer a leading **checkbox** for each option — a familiar
+"pick from a list" affordance. Use the `option` slot to render one:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const notify = ref<string[]>(['Push'])
+const channels = ['Email', 'Push', 'SMS', 'Slack', 'Webhook']
+</script>
+
+<template>
+  <VSelect v-model="notify" mode="multiple" :options="channels">
+    <template #option="{ option, selected }">
+      <input
+        type="checkbox"
+        :checked="selected"
+        tabindex="-1"
+        readonly
+        style="margin-right: 8px; pointer-events: none;"
+      />
+      <span>{{ option.label }}</span>
+    </template>
+  </VSelect>
+</template>
+```
+
+<div class="demo" style="max-width: 480px;">
+  <VSelect
+    v-model="checkbox"
+    mode="multiple"
+    :options="['Email', 'Push', 'SMS', 'Slack', 'Webhook']"
+    placeholder="Notification channels"
+    :close-on-select="false"
+  >
+    <template #option="{ option, selected }">
+      <input
+        type="checkbox"
+        :checked="selected"
+        tabindex="-1"
+        readonly
+        style="margin-right: 8px; pointer-events: none;"
+      />
+      <span>{{ option.label }}</span>
+    </template>
+  </VSelect>
+  <div class="demo-meta">Selected: <code>{{ JSON.stringify(checkbox) }}</code></div>
+</div>
+
+A few small but important details:
+
+- **`pointer-events: none` on the checkbox** — the row's `mousedown` already
+  handles toggle. Letting the native checkbox process clicks would cause a
+  double-toggle (input fires, then row fires).
+- **`tabindex="-1"`** — the row is the focus target via
+  `aria-activedescendant`; the checkbox shouldn't steal Tab order.
+- **`readonly`** — visual reflection only. The component is the source of
+  truth.
+- **No keyboard `change` handler needed** — `useKeyboardNav` already maps
+  Space / Enter to "select active row".
+
+For a tree of checkboxes (categories with tri-state parents), use
+[`<VTreeSelect>`](./tree-select) — it ships native checkboxes and the
+indeterminate state out of the box.
