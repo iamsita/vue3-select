@@ -269,8 +269,21 @@ onBeforeUnmount(() => {
 function onControlMousedown(event: MouseEvent) {
   if (props.disabled) return
   const target = event.target as HTMLElement
+  // Internal controls (clear button, tag remove, chevron) handle their own
+  // clicks — never let those pathways toggle the menu.
   if (target.closest('.vselect-tag-remove, .vselect-indicator')) return
-  if (target.tagName === 'INPUT') return
+
+  // Clicking the search input *should* open the menu (it currently doesn't,
+  // which makes the trigger feel half-broken in single mode where the input
+  // covers most of the control). Let the browser place the caret as normal
+  // — don't preventDefault — but make sure the menu is open. We use
+  // `open()` rather than `toggle()` so clicking inside an already-open
+  // input doesn't close the menu out from under the user.
+  if (target.tagName === 'INPUT') {
+    if (!isOpen.value) open()
+    return
+  }
+
   event.preventDefault()
   if (props.searchable && searchEl.value) searchEl.value.focus()
   toggle()

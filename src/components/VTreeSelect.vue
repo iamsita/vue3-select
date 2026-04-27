@@ -243,7 +243,13 @@ function onControlMousedown(event: MouseEvent) {
   if (props.disabled) return
   const target = event.target as HTMLElement
   if (target.closest('.vselect-tag-remove, .vselect-indicator')) return
-  if (target.tagName === 'INPUT') return
+  // Clicking the search input should open the menu — don't preventDefault
+  // so caret placement still works. Use `open()` rather than the toggle so
+  // an already-open menu doesn't snap shut on the user.
+  if (target.tagName === 'INPUT') {
+    if (!isOpen.value) open()
+    return
+  }
   event.preventDefault()
   if (props.searchable && searchEl.value) searchEl.value.focus()
   toggleOpen()
