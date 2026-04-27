@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T = unknown">
-import type { NormalizedOption } from '../types/option'
-import { CheckIcon } from './icons'
+import type { NormalizedOption } from '@/types/option'
+import { CheckIcon } from '@/components/icons'
 
 defineOptions({ name: 'VSelectOption', inheritAttrs: false })
 
@@ -40,7 +40,12 @@ function onMousedown(event: MouseEvent, option: NormalizedOption<T>) {
     @mousemove="emit('highlight', option)"
     @mousedown="onMousedown($event, option)"
   >
-    <slot :option="option" :selected="selected" :active="active" :disabled="option.disabled || false">
+    <slot
+      :option="option"
+      :selected="selected"
+      :active="active"
+      :disabled="option.disabled || false"
+    >
       <span class="vselect-option-label">{{ option.label }}</span>
       <span v-if="selected" class="vselect-option-check">
         <CheckIcon />

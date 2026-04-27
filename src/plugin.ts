@@ -1,7 +1,7 @@
 import type { App, Plugin } from 'vue'
-import VSelect from './components/VSelect.vue'
-import VSelectOption from './components/VSelectOption.vue'
-import VSelectTag from './components/VSelectTag.vue'
+import VSelect from '@/components/VSelect.vue'
+import VSelectOption from '@/components/VSelectOption.vue'
+import VSelectTag from '@/components/VSelectTag.vue'
 
 export interface VueSelectPluginOptions {
   /** Override the global tag for `<VSelect>` (default: 'VSelect'). */

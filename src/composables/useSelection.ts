@@ -1,6 +1,6 @@
 import { computed, ref, watch, type Ref } from 'vue'
-import type { NormalizedOption, SelectMode } from '../types/option'
-import { toggleValue, valuesEqual } from '../core/compare'
+import type { NormalizedOption, SelectMode } from '@/types/option'
+import { toggleValue, valuesEqual } from '@/core/compare'
 
 export interface UseSelectionOptions<T> {
   modelValue: Ref<unknown>
@@ -36,13 +36,12 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     return selectedValues.value.map((v) => {
       const found = opts.options.value.find((o) => valuesEqual(o.value, v))
       if (found) return found
-      const label = typeof v === 'object' && v !== null
-        ? String(
-            (v as Record<string, unknown>).label
-              ?? (v as Record<string, unknown>).name
-              ?? '',
-          )
-        : String(v)
+      const label =
+        typeof v === 'object' && v !== null
+          ? String(
+              (v as Record<string, unknown>).label ?? (v as Record<string, unknown>).name ?? '',
+            )
+          : String(v)
       return {
         id: `synthetic-${label}`,
         value: v,
@@ -102,7 +101,8 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     activeIndex.value = -1
   }
   function toggle() {
-    isOpen.value ? close() : open()
+    if (isOpen.value) close()
+    else open()
   }
 
   /** Reset the highlight when the visible list changes underneath us. */

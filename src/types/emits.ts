@@ -1,4 +1,4 @@
-import type { NormalizedOption } from './option'
+import type { NormalizedOption } from '@/types/option'
 
 export interface VSelectEmits<T = unknown> {
   (e: 'update:modelValue', value: unknown): void
@@ -21,5 +21,7 @@ export interface VSelectInstance {
   focus: () => void
   blur: () => void
   clear: () => void
+  /** When `debounce` is set, fires the pending search emit immediately. No-op otherwise. */
+  flushSearch: () => void
   isOpen: boolean
 }

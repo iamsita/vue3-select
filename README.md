@@ -1,9 +1,9 @@
-# @matat/vue3-select
+# vue3-select
 
 A typed, accessible, headless-friendly select for Vue 3.
 Single, multi, tags, async, grouped — one component, zero surprises.
 
-[![npm](https://img.shields.io/npm/v/@matat/vue3-select.svg)](https://www.npmjs.com/package/@matat/vue3-select)
+[![npm](https://img.shields.io/npm/v/vue3-select.svg)](https://www.npmjs.com/package/vue3-select)
 [![bundle](https://img.shields.io/badge/bundle-6.3kb%20gz-blue)](#)
 [![types](https://img.shields.io/badge/types-included-3178c6)](#)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -24,47 +24,22 @@ Single, multi, tags, async, grouped — one component, zero surprises.
 
 ## Install
 
-### npm (TypeScript / bundlers)
-
 ```bash
-npm i @matat/vue3-select
+npm i vue3-select
 ```
 
 `@floating-ui/vue` is a regular dependency, so npm pulls it in automatically.
+The package ships ESM and CJS only — bring your own bundler (Vite, Webpack,
+Rollup, esbuild, Bun, etc.).
 
-### CDN (no build step)
-
-```html
-<link rel="stylesheet" href="https://unpkg.com/@matat/vue3-select/dist/vue3-select.css" />
-
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="https://unpkg.com/@matat/vue3-select"></script>
-
-<script>
-  const { createApp, ref } = Vue
-  const { VSelect } = VueSelect
-
-  createApp({
-    components: { VSelect },
-    setup() {
-      return { picked: ref(null), fruits: ['Apple', 'Banana', 'Cherry'] }
-    },
-    template: '<v-select v-model="picked" :options="fruits" />',
-  }).mount('#app')
-</script>
-```
-
-The CDN bundle inlines `@floating-ui/vue` so only Vue itself needs a separate
-script tag.
-
-## Quick start (bundler)
+## Quick start
 
 ```ts
 // main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import '@matat/vue3-select/style.css'
+import 'vue3-select/style.css'
 
 createApp(App).mount('#app')
 ```
@@ -72,7 +47,7 @@ createApp(App).mount('#app')
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VSelect } from '@matat/vue3-select'
+import { VSelect } from 'vue3-select'
 
 const fruit = ref<string | null>(null)
 const fruits = ['Apple', 'Banana', 'Cherry']
@@ -90,7 +65,7 @@ const fruits = ['Apple', 'Banana', 'Cherry']
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VSelect } from '@matat/vue3-select'
+import { VSelect } from 'vue3-select'
 
 interface Country { code: string; name: string; region: string }
 const countries: Country[] = [/* … */]
@@ -115,7 +90,7 @@ const selected = ref<string[]>([])
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VSelect } from '@matat/vue3-select'
+import { VSelect } from 'vue3-select'
 
 const results = ref([])
 const loading = ref(false)
@@ -169,7 +144,7 @@ The composables that power `<VSelect>` are exported individually. Build your
 own UI on top:
 
 ```ts
-import { useSelection, useOptionFilter, useKeyboardNav, normalize } from '@matat/vue3-select'
+import { useSelection, useOptionFilter, useKeyboardNav, normalize } from 'vue3-select'
 ```
 
 ## API
@@ -267,8 +242,8 @@ Built-in dark mode:
 Accent presets ship as separate SCSS files:
 
 ```scss
-@use '@matat/vue3-select/scss/themes/emerald';
-@use '@matat/vue3-select/scss/themes/rose';
+@use 'vue3-select/scss/themes/emerald';
+@use 'vue3-select/scss/themes/rose';
 ```
 
 ```vue
@@ -297,6 +272,4 @@ npm run build        # type-check + lib build → dist/
 npm run build:demo   # static playground build
 ```
 
-## License
-
-MIT © Matat
+## Licenses

@@ -24,6 +24,7 @@ export interface NormalizedOption<T = unknown> {
  * (rather than `Record<string, unknown>`) so plain interfaces — which lack an
  * index signature — still satisfy the constraint.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type OptionLike = string | number | Record<string, any>
 
 /** Resolves either a property name on the option or an extractor function. */

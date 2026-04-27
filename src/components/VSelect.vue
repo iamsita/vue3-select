@@ -8,9 +8,7 @@ import {
   size as floatingSize,
   useFloating,
 } from '@floating-ui/vue'
-import type { NormalizedOption, OptionLike } from '../types/option'
-import type { VSelectProps } from '../types/props'
-import type { VSelectInstance } from '../types/emits'
+import type { NormalizedOption, OptionLike } from '@/types/option'
 import type {
   ClearIconSlotProps,
   CreateSlotProps,
@@ -21,15 +19,18 @@ import type {
   OptionSlotProps,
   TagSlotProps,
   ValueSlotProps,
-} from '../types/slots'
-import { normalize } from '../core/normalize'
-import { useOptionFilter } from '../composables/useOptionFilter'
-import { useStableId } from '../composables/useStableId'
-import { useKeyboardNav } from '../composables/useKeyboardNav'
-import { useSelection } from '../composables/useSelection'
-import { ChevronDownIcon, CloseIcon } from './icons'
-import VSelectOption from './VSelectOption.vue'
-import VSelectTag from './VSelectTag.vue'
+  VSelectInstance,
+  VSelectProps,
+} from '@/types'
+import { normalize } from '@/core/normalize'
+import { useOptionFilter } from '@/composables/useOptionFilter'
+import { useStableId } from '@/composables/useStableId'
+import { useKeyboardNav } from '@/composables/useKeyboardNav'
+import { useSelection } from '@/composables/useSelection'
+import { useDebounced } from '@/composables/useDebounced'
+import { ChevronDownIcon, CloseIcon } from '@/components/icons'
+import VSelectOption from '@/components/VSelectOption.vue'
+import VSelectTag from '@/components/VSelectTag.vue'
 
 defineOptions({ name: 'VSelect', inheritAttrs: false })
 
@@ -53,6 +54,7 @@ const props = withDefaults(defineProps<VSelectProps<T>>(), {
   taggable: false,
   filter: undefined,
   caseSensitive: false,
+  debounce: undefined,
   emptyText: 'No options',
   noResultsText: undefined,
   loadingText: 'Loading…',
@@ -92,7 +94,20 @@ const controlEl = ref<HTMLElement | null>(null)
 const menuEl = ref<HTMLElement | null>(null)
 const searchEl = ref<HTMLInputElement | null>(null)
 
+// `query` is the live input value — kept in sync with the DOM input on
+// every keystroke so typing feels instant. `effectiveQuery` is the value
+// that drives filtering and the `search` / `update:search` emits, debounced
+// when the prop is set. They're the same ref when `debounce` is unset / 0.
 const query = ref('')
+const debounceMs = computed(() => props.debounce)
+const {
+  debounced: effectiveQuery,
+  flush: flushSearch,
+  cancel: cancelSearch,
+  force: forceSearch,
+} = useDebounced(query, debounceMs)
+void cancelSearch
+
 const focused = ref(false)
 
 const modelRef = computed(() => props.modelValue)
@@ -132,14 +147,12 @@ const {
 
 const { filtered } = useOptionFilter<T>({
   options: normalizedOptions,
-  query,
+  query: effectiveQuery,
   filter: props.filter,
   caseSensitive: computed(() => props.caseSensitive),
 })
 
-const closeOnSelectResolved = computed(
-  () => props.closeOnSelect ?? props.mode === 'single',
-)
+const closeOnSelectResolved = computed(() => props.closeOnSelect ?? props.mode === 'single')
 
 const taggableRef = computed(() => props.taggable || props.mode === 'tags')
 
@@ -156,8 +169,10 @@ function selectActive() {
   if (!option) return
   select(option)
   if (closeOnSelectResolved.value) close()
+  // Reset the search and skip the debounce — the menu should reflect the
+  // selection immediately, not after the next trailing edge.
   query.value = ''
-  emit('update:search', '')
+  forceSearch('')
 }
 
 function createFromQuery() {
@@ -165,7 +180,7 @@ function createFromQuery() {
   if (!q) return
   emit('create', q)
   query.value = ''
-  emit('update:search', '')
+  forceSearch('')
 }
 
 function deselectLast() {
@@ -223,7 +238,9 @@ watch(isOpen, (open) => {
   }
 })
 
-watch(query, (q) => {
+// Emits + active-index reset run off the *effective* query so async consumers
+// only see one fire per debounced change, not one per keystroke.
+watch(effectiveQuery, (q) => {
   emit('update:search', q)
   emit('search', q)
   nextTick(() => {
@@ -252,8 +269,21 @@ onBeforeUnmount(() => {
 function onControlMousedown(event: MouseEvent) {
   if (props.disabled) return
   const target = event.target as HTMLElement
+  // Internal controls (clear button, tag remove, chevron) handle their own
+  // clicks — never let those pathways toggle the menu.
   if (target.closest('.vselect-tag-remove, .vselect-indicator')) return
-  if (target.tagName === 'INPUT') return
+
+  // Clicking the search input *should* open the menu (it currently doesn't,
+  // which makes the trigger feel half-broken in single mode where the input
+  // covers most of the control). Let the browser place the caret as normal
+  // — don't preventDefault — but make sure the menu is open. We use
+  // `open()` rather than `toggle()` so clicking inside an already-open
+  // input doesn't close the menu out from under the user.
+  if (target.tagName === 'INPUT') {
+    if (!isOpen.value) open()
+    return
+  }
+
   event.preventDefault()
   if (props.searchable && searchEl.value) searchEl.value.focus()
   toggle()
@@ -288,6 +318,7 @@ function onOptionPick(option: NormalizedOption<T>) {
     searchEl.value.focus()
   }
   query.value = ''
+  forceSearch('')
 }
 
 function onClearClick(event: MouseEvent) {
@@ -295,6 +326,7 @@ function onClearClick(event: MouseEvent) {
   event.stopPropagation()
   clear()
   query.value = ''
+  forceSearch('')
   if (props.searchable && searchEl.value) searchEl.value.focus()
 }
 
@@ -379,6 +411,7 @@ defineExpose<VSelectInstance>({
   focus: () => searchEl.value?.focus() ?? controlEl.value?.focus(),
   blur: () => searchEl.value?.blur() ?? controlEl.value?.blur(),
   clear,
+  flushSearch,
   get isOpen() {
     return isOpen.value
   },
@@ -458,12 +491,7 @@ defineSlots<{
         <!-- Default rendering: tags in multi/tags mode. -->
         <template v-else-if="isMulti">
           <template v-for="option in visibleTags" :key="option.id">
-            <slot
-              name="tag"
-              :option="option"
-              :remove="() => deselect(option)"
-              :disabled="disabled"
-            >
+            <slot name="tag" :option="option" :remove="() => deselect(option)" :disabled="disabled">
               <VSelectTag :option="option" :disabled="disabled" @remove="onTagRemove" />
             </slot>
           </template>
@@ -478,10 +506,7 @@ defineSlots<{
         </template>
 
         <!-- Placeholder. -->
-        <span
-          v-if="!hasSelection && !query"
-          class="vselect-placeholder"
-        >{{ placeholder }}</span>
+        <span v-if="!hasSelection && !query" class="vselect-placeholder">{{ placeholder }}</span>
 
         <!-- Search input. -->
         <input
@@ -508,11 +533,7 @@ defineSlots<{
         <slot v-if="loading" name="loader" :in-menu="false">
           <span class="vselect-spinner" aria-hidden="true" />
         </slot>
-        <slot
-          v-else-if="clearable && hasSelection && !disabled"
-          name="clearicon"
-          :clear="clear"
-        >
+        <slot v-else-if="clearable && hasSelection && !disabled" name="clearicon" :clear="clear">
           <button
             type="button"
             class="vselect-indicator"
@@ -609,11 +630,7 @@ defineSlots<{
         </template>
 
         <slot v-if="showCreate" name="create" :query="query" :create="createFromQuery">
-          <div
-            class="vselect-create"
-            role="option"
-            @mousedown.prevent="createFromQuery"
-          >
+          <div class="vselect-create" role="option" @mousedown.prevent="createFromQuery">
             Create <strong>{{ query }}</strong>
           </div>
         </slot>

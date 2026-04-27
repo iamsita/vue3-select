@@ -1,7 +1,7 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
-import type { FilterFn } from '../types/filter'
-import type { NormalizedOption } from '../types/option'
-import { defaultFilter } from '../core/filter'
+import type { FilterFn } from '@/types/filter'
+import type { NormalizedOption } from '@/types/option'
+import { defaultFilter } from '@/core/filter'
 
 export interface UseOptionFilterOptions<T> {
   options: Ref<NormalizedOption<T>[]>

@@ -1,5 +1,5 @@
-import type { FilterFn } from './filter'
-import type { OptionLike, SelectMode, SelectSize, SelectTheme } from './option'
+import type { FilterFn } from '@/types/filter'
+import type { OptionLike, SelectMode, SelectSize, SelectTheme } from '@/types/option'
 
 /**
  * Public props surface for `<VSelect>`. Defined here (rather than inline in
@@ -39,6 +39,14 @@ export interface VSelectProps<T extends OptionLike = OptionLike> {
   /** Custom filter function — overrides the default substring match. */
   filter?: FilterFn<T>
   caseSensitive?: boolean
+
+  /**
+   * Delay (ms) between the last keystroke and the `search` / `update:search`
+   * emits and the local filter recomputation. The visible input value still
+   * updates immediately so typing feels instant. Set this to drive async
+   * requests without writing your own setTimeout dance.
+   */
+  debounce?: number
 
   /** Shown in the menu when the option list is empty. */
   emptyText?: string

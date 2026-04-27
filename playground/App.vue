@@ -6,6 +6,7 @@ import TagsExample from './examples/TagsExample.vue'
 import AsyncExample from './examples/AsyncExample.vue'
 import CustomSlotExample from './examples/CustomSlotExample.vue'
 import SizesExample from './examples/SizesExample.vue'
+import TreeExample from './examples/TreeExample.vue'
 
 const theme = ref<'light' | 'dark' | 'auto'>('light')
 const themeBg = computed(() => (theme.value === 'dark' ? '#0b1220' : '#f8fafc'))
@@ -21,8 +22,8 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
         <span class="tag">v0.1.0</span>
       </div>
       <p class="lead">
-        A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags,
-        async, grouped — one component, zero surprises.
+        A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags, async, grouped
+        — one component, zero surprises.
       </p>
       <label class="theme-switch">
         Theme
@@ -35,18 +36,39 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
     </header>
 
     <section class="grid">
-      <BasicExample :theme="theme" />
-      <MultiExample :theme="theme" />
-      <TagsExample :theme="theme" />
-      <AsyncExample :theme="theme" />
-      <CustomSlotExample :theme="theme" />
-      <SizesExample :theme="theme" />
+      <div class="single-row">
+        <BasicExample :theme="theme" />
+      </div>
+
+      <div class="single-row">
+        <MultiExample :theme="theme" />
+      </div>
+
+      <div class="single-row">
+        <TagsExample :theme="theme" />
+      </div>
+
+      <div class="single-row">
+        <AsyncExample :theme="theme" />
+      </div>
+
+      <div class="single-row">
+        <CustomSlotExample :theme="theme" />
+      </div>
+
+      <div class="single-row">
+        <SizesExample :theme="theme" />
+      </div>
+
+      <div class="single-row">
+        <TreeExample :theme="theme" />
+      </div>
     </section>
 
     <footer>
       <p>
-        Press <kbd>↓</kbd>/<kbd>↑</kbd> to navigate, <kbd>Enter</kbd> to select,
-        <kbd>Esc</kbd> to close, <kbd>⌫</kbd> to remove the last tag.
+        Press <kbd>↓</kbd>/<kbd>↑</kbd> to navigate, <kbd>Enter</kbd> to select, <kbd>Esc</kbd> to
+        close, <kbd>⌫</kbd> to remove the last tag.
       </p>
     </footer>
   </main>
@@ -54,20 +76,28 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
 
 <style>
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-* { box-sizing: border-box; }
-body { margin: 0; }
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
 main {
+  width: 100vw;
   min-height: 100vh;
-  padding: 48px 24px 80px;
-  transition: background 200ms ease, color 200ms ease;
+  padding: 48px 32px 80px;
+  transition:
+    background 200ms ease,
+    color 200ms ease;
+  box-sizing: border-box;
 }
 header {
-  max-width: 1080px;
-  margin: 0 auto 40px;
+  margin: 0 0 40px;
 }
 .brand {
   display: flex;
@@ -115,11 +145,14 @@ header {
   color: inherit;
 }
 .grid {
-  max-width: 1080px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+}
+.single-row {
+  width: 100%;
 }
 .card {
   background: rgba(255, 255, 255, 0.6);
@@ -181,8 +214,8 @@ header {
   line-height: 1;
 }
 footer {
-  max-width: 1080px;
-  margin: 60px auto 0;
+  /* max-width: 1080px; */
+  margin: 60px 0 0;
   font-size: 13px;
   opacity: 0.65;
 }

@@ -12,6 +12,7 @@
 @use 'parts/menu' as menu;
 @use 'parts/option' as option;
 @use 'parts/group' as group;
+@use 'parts/tree' as tree;
 
 @layer vselect {
   @include animations.styles;
@@ -23,6 +24,7 @@
   @include menu.styles;
   @include option.styles;
   @include group.styles;
+  @include tree.styles;
 
   // Default tokens applied to the component root. Scoped to `.vselect` so
   // the custom properties don't leak into surrounding CSS.

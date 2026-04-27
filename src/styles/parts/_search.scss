@@ -10,16 +10,16 @@
     outline: none;
     color: inherit;
     font: inherit;
-  
+
     &::placeholder {
       color: var(--vselect-text-placeholder);
     }
-  
+
     &:disabled {
       cursor: not-allowed;
     }
   }
-  
+
   .vselect-search.is-hidden {
     position: absolute;
     width: 1px;

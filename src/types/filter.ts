@@ -1,4 +1,4 @@
-import type { NormalizedOption } from './option'
+import type { NormalizedOption } from '@/types/option'
 
 export interface FilterContext<T> {
   query: string

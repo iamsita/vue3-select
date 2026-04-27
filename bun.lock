@@ -3,9 +3,9 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@matat/vue3-select",
+      "name": "vue3-select",
       "dependencies": {
-        "@floating-ui/vue": "^1.0.0",
+        "@floating-ui/vue": "^1.0.0"
       },
       "devDependencies": {
         "@tsconfig/node24": "^24.0.4",
