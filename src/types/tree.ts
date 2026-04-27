@@ -31,6 +31,7 @@ export interface NormalizedTreeNode<T = unknown> {
  * pull `value` / `label` / `children` out — and pin the constraint loosely
  * so plain interfaces (without an index signature) still satisfy it.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type TreeOptionLike = Record<string, any>
 
 /**

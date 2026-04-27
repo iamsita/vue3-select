@@ -201,7 +201,8 @@ function close() {
 }
 
 function toggleOpen() {
-  isOpen.value ? close() : open()
+  if (isOpen.value) close()
+  else open()
 }
 
 function onToggle(node: NormalizedTreeNode<T>) {
