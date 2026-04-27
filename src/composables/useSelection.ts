@@ -101,7 +101,8 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     activeIndex.value = -1
   }
   function toggle() {
-    isOpen.value ? close() : open()
+    if (isOpen.value) close()
+    else open()
   }
 
   /** Reset the highlight when the visible list changes underneath us. */

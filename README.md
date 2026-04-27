@@ -24,40 +24,15 @@ Single, multi, tags, async, grouped — one component, zero surprises.
 
 ## Install
 
-### npm (TypeScript / bundlers)
-
 ```bash
 npm i vue3-select
 ```
 
 `@floating-ui/vue` is a regular dependency, so npm pulls it in automatically.
+The package ships ESM and CJS only — bring your own bundler (Vite, Webpack,
+Rollup, esbuild, Bun, etc.).
 
-### CDN (no build step)
-
-```html
-<link rel="stylesheet" href="https://unpkg.com/vue3-select/dist/vue3-select.css" />
-
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="https://unpkg.com/vue3-select"></script>
-
-<script>
-  const { createApp, ref } = Vue
-  const { VSelect } = VueSelect
-
-  createApp({
-    components: { VSelect },
-    setup() {
-      return { picked: ref(null), fruits: ['Apple', 'Banana', 'Cherry'] }
-    },
-    template: '<v-select v-model="picked" :options="fruits" />',
-  }).mount('#app')
-</script>
-```
-
-The CDN bundle inlines `@floating-ui/vue` so only Vue itself needs a separate
-script tag.
-
-## Quick start (bundler)
+## Quick start
 
 ```ts
 // main.ts
