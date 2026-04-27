@@ -12,13 +12,6 @@ export interface UseSelectionOptions<T> {
   emitDeselect: (option: NormalizedOption<T>) => void
 }
 
-/**
- * Core selection state machine. Translates between the v-model shape (one
- * value vs an array) and the internal list of selected normalised options
- * the UI renders. We resolve selections against the option list so that, for
- * object options, the rendered selection survives a referential refresh of
- * the same value (e.g. async option list reloads).
- */
 export function useSelection<T>(opts: UseSelectionOptions<T>) {
   const isMulti = computed(() => opts.mode.value !== 'single')
 
@@ -28,10 +21,6 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     return Array.isArray(value) ? value : [value]
   })
 
-  /**
-   * If a value has no matching option (common during async loading) we
-   * synthesise a placeholder so the chip/label still renders.
-   */
   const selectedOptions = computed<NormalizedOption<T>[]>(() => {
     return selectedValues.value.map((v) => {
       const found = opts.options.value.find((o) => valuesEqual(o.value, v))
@@ -105,7 +94,6 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     else open()
   }
 
-  /** Reset the highlight when the visible list changes underneath us. */
   watch(
     () => opts.options.value.length,
     () => {

@@ -1,9 +1,5 @@
-// Design tokens exposed as CSS custom properties on the component root.
-// Consumers override at any cascade level — no SCSS recompile required.
-// Every token is `--vselect-*` so it never collides with consumer styles.
 
 @mixin tokens {
-  // Sizing
   --vselect-radius: 8px;
   --vselect-radius-sm: 6px;
   --vselect-border-width: 1px;
@@ -18,52 +14,42 @@
   --vselect-font-size-lg: 16px;
   --vselect-line-height: 1.4;
 
-  // Surface colors
   --vselect-bg: #ffffff;
   --vselect-bg-hover: #f8fafc;
   --vselect-bg-disabled: #f1f5f9;
   --vselect-menu-bg: #ffffff;
 
-  // Border colors
   --vselect-border: #e2e8f0;
   --vselect-border-hover: #cbd5e1;
   --vselect-border-focus: #6366f1;
 
-  // Text colors
   --vselect-text: #0f172a;
   --vselect-text-muted: #64748b;
   --vselect-text-placeholder: #94a3b8;
   --vselect-text-disabled: #94a3b8;
 
-  // Accent colors
   --vselect-accent: #6366f1;
   --vselect-accent-soft: #eef2ff;
   --vselect-accent-text: #ffffff;
   --vselect-danger: #ef4444;
   --vselect-danger-soft: #fef2f2;
 
-  // Option states
   --vselect-option-active-bg: #f1f5f9;
   --vselect-option-selected-bg: #eef2ff;
   --vselect-option-selected-text: #4338ca;
 
-  // Tags
   --vselect-tag-bg: #f1f5f9;
   --vselect-tag-text: #0f172a;
   --vselect-tag-remove: #64748b;
   --vselect-tag-remove-hover: #ef4444;
 
-  // Focus ring
   --vselect-focus-ring: 0 0 0 1px rgba(99, 102, 241, 0.18);
 
-  // Elevation
   --vselect-shadow-menu:
     0 6px 24px -8px rgba(15, 23, 42, 0.18), 0 2px 6px -2px rgba(15, 23, 42, 0.08);
 
-  // Layering
   --vselect-z-menu: 1000;
 
-  // Motion
   --vselect-transition: 120ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 

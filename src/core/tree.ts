@@ -9,12 +9,6 @@ interface NormalizeTreeConfig<T> {
   optionDisabled?: OptionAccessor<T, boolean>
 }
 
-/**
- * Walks the user-supplied tree and produces a normalised mirror with depth,
- * parent links, and stable ids attached to every node. The output preserves
- * the input's structure (branches and leaves stay where they are) so the
- * renderer can recurse over `children` without having to look anything up.
- */
 export function normalizeTree<T extends TreeOptionLike>(
   options: readonly T[],
   config: NormalizeTreeConfig<T>,
@@ -72,10 +66,6 @@ export function normalizeTree<T extends TreeOptionLike>(
   return options.map((option, index) => visit(option, 0, null, String(index)))
 }
 
-/**
- * Depth-first walk. Visits every node; the callback can short-circuit by
- * returning `false` (stops descending into that branch).
- */
 export function walkTree<T>(
   nodes: readonly NormalizedTreeNode<T>[],
   visit: (node: NormalizedTreeNode<T>) => boolean | void,
@@ -86,10 +76,6 @@ export function walkTree<T>(
   }
 }
 
-/**
- * Flattens the tree to a single array of nodes in depth-first order. Useful
- * for keyboard-nav and search indexing where order matters.
- */
 export function flattenTree<T>(nodes: readonly NormalizedTreeNode<T>[]): NormalizedTreeNode<T>[] {
   const out: NormalizedTreeNode<T>[] = []
   walkTree(nodes, (n) => {
@@ -98,11 +84,6 @@ export function flattenTree<T>(nodes: readonly NormalizedTreeNode<T>[]): Normali
   return out
 }
 
-/**
- * Collects every leaf value reachable from the given node (or roots).
- * The selection model emits leaves into v-model, so callers use this when
- * the user toggles a parent to know which values to add or remove.
- */
 export function getLeafValues<T>(node: NormalizedTreeNode<T> | NormalizedTreeNode<T>[]): unknown[] {
   const out: unknown[] = []
   const roots = Array.isArray(node) ? node : [node]
@@ -112,11 +93,6 @@ export function getLeafValues<T>(node: NormalizedTreeNode<T> | NormalizedTreeNod
   return out
 }
 
-/**
- * Filters the tree against a search query, keeping any node whose own label
- * matches **or** whose subtree contains a match. Ancestors of matches are
- * preserved so the rendered tree stays well-formed.
- */
 export function filterTree<T>(
   nodes: readonly NormalizedTreeNode<T>[],
   query: string,
@@ -138,8 +114,6 @@ export function filterTree<T>(
 
     if (!selfMatch && filteredChildren.length === 0) return null
     if (filteredChildren.length === node.children.length && selfMatch) return node
-    // Re-shape with surviving children. Keep `isLeaf` honest — a parent with
-    // all children filtered out behaves like a (still-non-selectable) leaf.
     return { ...node, children: filteredChildren }
   }
 
@@ -151,10 +125,6 @@ export function filterTree<T>(
   return out
 }
 
-/**
- * Returns the ids on the path from the given node to the root, inclusive of
- * the node itself. Used to auto-expand ancestors when search reveals a match.
- */
 export function getAncestorIds<T>(
   node: NormalizedTreeNode<T>,
   byId: Map<string, NormalizedTreeNode<T>>,

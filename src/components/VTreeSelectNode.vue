@@ -7,11 +7,8 @@ defineOptions({ name: 'VTreeSelectNode', inheritAttrs: false })
 
 const props = defineProps<{
   node: NormalizedTreeNode<T>
-  /** Set of expanded node ids — passed in for shared state across the tree. */
   expanded: Set<string>
-  /** Resolver for the tri-state of any node, leaf or parent. */
   getCheckState: (node: NormalizedTreeNode<T>) => TreeNodeCheckState
-  /** DOM-id prefix from the parent VTreeSelect (used by aria wiring). */
   idPrefix: string
 }>()
 
@@ -21,8 +18,6 @@ const emit = defineEmits<{
   (e: 'collapse', node: NormalizedTreeNode<T>): void
 }>()
 
-// Local mirror of `expanded.has(node.id)` so the chevron animates without
-// requiring the parent to re-render every node on every toggle.
 const isExpanded = ref(props.expanded.has(props.node.id))
 watch(
   () => props.expanded,
@@ -37,14 +32,11 @@ const checked = computed(() => checkState.value === 'checked')
 const indeterminate = computed(() => checkState.value === 'indeterminate')
 
 const rowStyle = computed(() => ({
-  // 18px expander + 8px gap → align children under the parent's label.
   paddingLeft: `${8 + props.node.depth * 22}px`,
 }))
 
 const checkboxRef = ref<HTMLInputElement | null>(null)
 
-// Native checkboxes don't accept `:indeterminate` as an attribute — it has
-// to be set imperatively on the DOM element.
 watch(
   indeterminate,
   (v) => {
@@ -61,8 +53,6 @@ function onExpanderClick(event: MouseEvent) {
 }
 
 function onRowMousedown(event: MouseEvent) {
-  // Toggle-on-row-click is a common UX shortcut; the checkbox swallows its
-  // own click so we don't double-toggle.
   if (event.target instanceof HTMLInputElement) return
   if (props.node.disabled) return
   event.preventDefault()

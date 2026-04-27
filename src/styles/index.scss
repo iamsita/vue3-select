@@ -1,6 +1,3 @@
-// Public stylesheet entry. Every rule is wrapped in `@layer vselect` so
-// consumer overrides — even those written without `@layer` themselves —
-// naturally win the cascade without specificity wars.
 
 @use 'tokens' as tokens;
 @use 'base/animations' as animations;
@@ -26,13 +23,10 @@
   @include group.styles;
   @include tree.styles;
 
-  // Default tokens applied to the component root. Scoped to `.vselect` so
-  // the custom properties don't leak into surrounding CSS.
   .vselect {
     @include tokens.tokens;
   }
 
-  // Theme variants — apply via class on the root.
   .vselect--dark {
     @include tokens.dark-tokens;
   }

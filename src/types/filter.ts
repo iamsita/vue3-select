@@ -5,5 +5,4 @@ export interface FilterContext<T> {
   option: NormalizedOption<T>
 }
 
-/** Returns true if the option matches the active query. */
 export type FilterFn<T = unknown> = (ctx: FilterContext<T>) => boolean

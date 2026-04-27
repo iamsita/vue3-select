@@ -14,11 +14,6 @@ export interface UseKeyboardNavOptions<T> {
   createFromQuery: () => void
 }
 
-/**
- * Keyboard handler for the combobox. Centralised so the search input and the
- * trigger button share the same key map — typing "ArrowDown" feels the same
- * regardless of which element holds focus.
- */
 export function useKeyboardNav<T>(opts: UseKeyboardNavOptions<T>) {
   function move(delta: number) {
     const visible = opts.options.value
@@ -89,7 +84,6 @@ export function useKeyboardNav<T>(opts: UseKeyboardNavOptions<T>) {
         }
         break
       case 'Tab':
-        // Allow tab to escape but commit any active highlight in tags mode.
         if (opts.isOpen.value) opts.close()
         break
       case 'Backspace':

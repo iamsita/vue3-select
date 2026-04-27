@@ -1,5 +1,5 @@
 {
-  "name": "vue3-select",
+  "name": "@anilkumarthakur/vue3-select",
   "version": "0.1.0",
   "description": "A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags, async, grouped — one component, zero surprises.",
   "author": "Er. Anil Kumar Thakur <anilkumarthakur60@gmail.com>",

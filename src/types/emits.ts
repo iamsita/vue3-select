@@ -13,7 +13,6 @@ export interface VSelectEmits<T = unknown> {
   (e: 'search', query: string): void
 }
 
-/** Methods exposed via `defineExpose` — useful for parent-driven focus. */
 export interface VSelectInstance {
   open: () => void
   close: () => void
@@ -21,7 +20,6 @@ export interface VSelectInstance {
   focus: () => void
   blur: () => void
   clear: () => void
-  /** When `debounce` is set, fires the pending search emit immediately. No-op otherwise. */
   flushSearch: () => void
   isOpen: boolean
 }
