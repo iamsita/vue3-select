@@ -75,8 +75,64 @@ CI runs all of the above automatically on every PR.
 
 ## Commits
 
-No strict convention. Short imperative subject, optional body. Conventional
-commits (`feat:`, `fix:`, `docs:`) are welcome but not required.
+We use [Conventional Commits](https://www.conventionalcommits.org/), enforced
+by `commitlint` both locally (via `simple-git-hooks` on `commit-msg`) and in
+CI (`.github/workflows/commitlint.yml` lints every commit on the PR plus the
+PR title).
+
+Format:
+
+```
+<type>(<optional scope>): <subject>
+
+<optional body>
+
+<optional footer>
+```
+
+Allowed `<type>` values:
+
+| Type | Use for |
+|---|---|
+| `feat` | A user-facing new feature |
+| `fix` | A user-facing bug fix |
+| `docs` | README / CHANGELOG / docs site |
+| `style` | Formatting, whitespace — no code change |
+| `refactor` | Code change that's neither feat nor fix |
+| `perf` | Performance improvement |
+| `test` | Adding or correcting tests |
+| `build` | Build tooling, deps, vite/tsconfig/package.json |
+| `ci` | GitHub Actions / workflow changes |
+| `chore` | Anything else that isn't user-facing |
+| `revert` | A `git revert` style undo |
+
+Subject is lowercase, no trailing period, ≤100 chars.
+
+Examples:
+
+```
+feat: add caseSensitive prop to <VSelect>
+fix(tree): emit deselect for indeterminate parent toggle
+docs: clarify async loading example
+chore(deps): bump @floating-ui/vue to 1.1.0
+```
+
+Breaking changes go in the footer with `BREAKING CHANGE:` prefix:
+
+```
+feat: rename modelValue to model
+
+BREAKING CHANGE: the `modelValue` prop is now `model`.
+Migration: search-replace `modelValue` → `model` on every <VSelect>.
+```
+
+Why this matters: with conventional commits, the changelog and version
+bumps can be derived mechanically (we'll likely add `release-please` or
+`changesets` next), and the `master` git log reads as a coherent
+spec-revision document.
+
+Hooks install automatically on `npm install` via the `prepare` script. To
+re-install manually: `npx simple-git-hooks`.
 
 ## Releasing (maintainers only)
 

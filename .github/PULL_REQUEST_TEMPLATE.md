@@ -24,6 +24,8 @@
 - [ ] `npm run lint` clean
 - [ ] `npm run type-check` clean
 - [ ] `npm run build` produces a clean `dist/`
+- [ ] `npm run size` budgets still pass
+- [ ] Commits follow [Conventional Commits](https://www.conventionalcommits.org/) (CI will block otherwise)
 - [ ] Manually verified in `npm run dev` (or the docs site)
 
 ## Docs / changelog
