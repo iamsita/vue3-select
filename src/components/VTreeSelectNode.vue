@@ -92,9 +92,7 @@ function onCheckboxChange() {
         type="button"
         class="vselect-tree-expander"
         :class="{ 'is-leaf': node.isLeaf, 'is-open': isExpanded }"
-        :aria-label="
-          node.isLeaf ? undefined : isExpanded ? 'Collapse' : 'Expand'
-        "
+        :aria-label="node.isLeaf ? undefined : isExpanded ? 'Collapse' : 'Expand'"
         :tabindex="node.isLeaf ? -1 : 0"
         @mousedown.stop
         @click="onExpanderClick"

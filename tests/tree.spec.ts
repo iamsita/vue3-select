@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  filterTree,
-  flattenTree,
-  getLeafValues,
-  normalizeTree,
-  walkTree,
-} from '../src/core/tree'
+import { filterTree, flattenTree, getLeafValues, normalizeTree, walkTree } from '../src/core/tree'
 
 interface Cat {
   id: number
@@ -56,7 +50,7 @@ describe('normalizeTree', () => {
       ],
       { optionValue: 'id', optionLabel: 'name' },
     )
-    expect(flat.every((n) => n.isLeaf)) .toBe(true)
+    expect(flat.every((n) => n.isLeaf)).toBe(true)
   })
 
   it('falls back to `id` and `name` when no accessor is given', () => {
@@ -109,10 +103,14 @@ describe('getLeafValues', () => {
 
   it('skips disabled leaves', () => {
     const data = [
-      { id: 1, name: 'A', children: [
-        { id: 2, name: 'A.1', disabled: true, children: [] },
-        { id: 3, name: 'A.2', children: [] },
-      ] },
+      {
+        id: 1,
+        name: 'A',
+        children: [
+          { id: 2, name: 'A.1', disabled: true, children: [] },
+          { id: 3, name: 'A.2', children: [] },
+        ],
+      },
     ]
     const tree = normalizeTree(data, { optionValue: 'id', optionLabel: 'name' })
     expect(getLeafValues(tree)).toEqual([3])

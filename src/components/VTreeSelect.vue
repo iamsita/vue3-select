@@ -93,9 +93,7 @@ const tree = computed<NormalizedTreeNode<T>[]>(() =>
   normalizeTree(props.options, {
     optionValue: props.optionValue as OptionAccessor<T, unknown> | undefined,
     optionLabel: props.optionLabel as OptionAccessor<T, string> | undefined,
-    optionChildren: props.optionChildren as
-      | OptionAccessor<T, T[] | undefined>
-      | undefined,
+    optionChildren: props.optionChildren as OptionAccessor<T, T[] | undefined> | undefined,
     optionDisabled: props.optionDisabled as OptionAccessor<T, boolean> | undefined,
   }),
 )
@@ -365,11 +363,7 @@ void getCheckState as unknown as (n: NormalizedTreeNode<T>) => TreeNodeCheckStat
     >
       <div class="vselect-values">
         <template v-if="hasSelection && !query">
-          <span
-            v-for="node in visibleTags"
-            :key="node.id"
-            class="vselect-tag"
-          >
+          <span v-for="node in visibleTags" :key="node.id" class="vselect-tag">
             <span class="vselect-tag-label">{{ node.label }}</span>
             <button
               v-if="!disabled"
@@ -387,10 +381,7 @@ void getCheckState as unknown as (n: NormalizedTreeNode<T>) => TreeNodeCheckStat
           </span>
         </template>
 
-        <span
-          v-if="!hasSelection && !query"
-          class="vselect-placeholder"
-        >{{ placeholder }}</span>
+        <span v-if="!hasSelection && !query" class="vselect-placeholder">{{ placeholder }}</span>
 
         <input
           v-if="searchable"
@@ -452,14 +443,18 @@ void getCheckState as unknown as (n: NormalizedTreeNode<T>) => TreeNodeCheckStat
               class="vselect-tree-toolbar-action"
               tabindex="-1"
               @mousedown.prevent="selectAll"
-            >Select all</button>
+            >
+              Select all
+            </button>
             <button
               v-if="hasSelection"
               type="button"
               class="vselect-tree-toolbar-action"
               tabindex="-1"
               @mousedown.prevent="clear"
-            >Clear</button>
+            >
+              Clear
+            </button>
           </span>
         </div>
 

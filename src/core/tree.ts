@@ -34,16 +34,16 @@ export function normalizeTree<T extends TreeOptionLike>(
       node,
       config.optionLabel,
       String(
-        (node as Record<string, unknown>).label
-          ?? (node as Record<string, unknown>).name
-          ?? value
-          ?? '',
+        (node as Record<string, unknown>).label ??
+          (node as Record<string, unknown>).name ??
+          value ??
+          '',
       ),
     )
     const childrenRaw =
-      readAccessor(node, config.optionChildren, undefined as T[] | undefined)
-      ?? ((node as Record<string, unknown>).children as T[] | undefined)
-      ?? []
+      readAccessor(node, config.optionChildren, undefined as T[] | undefined) ??
+      ((node as Record<string, unknown>).children as T[] | undefined) ??
+      []
     const disabled = readAccessor(
       node,
       config.optionDisabled,
@@ -90,9 +90,7 @@ export function walkTree<T>(
  * Flattens the tree to a single array of nodes in depth-first order. Useful
  * for keyboard-nav and search indexing where order matters.
  */
-export function flattenTree<T>(
-  nodes: readonly NormalizedTreeNode<T>[],
-): NormalizedTreeNode<T>[] {
+export function flattenTree<T>(nodes: readonly NormalizedTreeNode<T>[]): NormalizedTreeNode<T>[] {
   const out: NormalizedTreeNode<T>[] = []
   walkTree(nodes, (n) => {
     out.push(n)
@@ -105,9 +103,7 @@ export function flattenTree<T>(
  * The selection model emits leaves into v-model, so callers use this when
  * the user toggles a parent to know which values to add or remove.
  */
-export function getLeafValues<T>(
-  node: NormalizedTreeNode<T> | NormalizedTreeNode<T>[],
-): unknown[] {
+export function getLeafValues<T>(node: NormalizedTreeNode<T> | NormalizedTreeNode<T>[]): unknown[] {
   const out: unknown[] = []
   const roots = Array.isArray(node) ? node : [node]
   walkTree(roots, (n) => {

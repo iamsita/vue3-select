@@ -23,9 +23,24 @@ const categories: Category[] = [
         name: 'Frontend Development',
         slug: 'frontend-development',
         children: [
-          { id: 3, name: 'HTML, CSS & UI Frameworks', slug: 'html-css-ui-frameworks', children: [] },
-          { id: 4, name: 'JavaScript & Frontend Frameworks', slug: 'javascript-frontend-frameworks', children: [] },
-          { id: 5, name: 'JavaScript & Backend Frameworks', slug: 'javascript-backend-frameworks', children: [] },
+          {
+            id: 3,
+            name: 'HTML, CSS & UI Frameworks',
+            slug: 'html-css-ui-frameworks',
+            children: [],
+          },
+          {
+            id: 4,
+            name: 'JavaScript & Frontend Frameworks',
+            slug: 'javascript-frontend-frameworks',
+            children: [],
+          },
+          {
+            id: 5,
+            name: 'JavaScript & Backend Frameworks',
+            slug: 'javascript-backend-frameworks',
+            children: [],
+          },
         ],
       },
       {
@@ -49,7 +64,12 @@ const categories: Category[] = [
         name: 'Infrastructure & Containers',
         slug: 'infrastructure-containers',
         children: [
-          { id: 11, name: 'Docker & Server Management', slug: 'docker-server-management', children: [] },
+          {
+            id: 11,
+            name: 'Docker & Server Management',
+            slug: 'docker-server-management',
+            children: [],
+          },
           { id: 12, name: 'AWS, Forge & Vapor', slug: 'aws-forge-vapor', children: [] },
         ],
       },
@@ -95,8 +115,18 @@ const categories: Category[] = [
 // Same data, but flat (the user's first example) — every node has children: [].
 const flatCategories: Category[] = [
   { id: 3, name: 'HTML, CSS & UI Frameworks', slug: 'html-css-ui-frameworks', children: [] },
-  { id: 4, name: 'JavaScript & Frontend Frameworks', slug: 'javascript-frontend-frameworks', children: [] },
-  { id: 5, name: 'JavaScript & Backend Frameworks', slug: 'javascript-backend-frameworks', children: [] },
+  {
+    id: 4,
+    name: 'JavaScript & Frontend Frameworks',
+    slug: 'javascript-frontend-frameworks',
+    children: [],
+  },
+  {
+    id: 5,
+    name: 'JavaScript & Backend Frameworks',
+    slug: 'javascript-backend-frameworks',
+    children: [],
+  },
 ]
 
 const selectedTree = ref<number[]>([4, 8])
@@ -107,9 +137,8 @@ const selectedFlat = ref<number[]>([])
   <article class="card">
     <h2>Tree — checkbox select</h2>
     <p>
-      Multi-level categories. Tick a parent to select all leaves under it,
-      tick leaves individually for partial coverage. Search filters across
-      every level and reveals matches.
+      Multi-level categories. Tick a parent to select all leaves under it, tick leaves individually
+      for partial coverage. Search filters across every level and reveals matches.
     </p>
     <VTreeSelect
       v-model="selectedTree"
@@ -126,7 +155,10 @@ const selectedFlat = ref<number[]>([])
 
   <article class="card">
     <h2>Tree — flat (children: [])</h2>
-    <p>The same component handles your flat list — when no node has children, it renders as a plain checkbox list.</p>
+    <p>
+      The same component handles your flat list — when no node has children, it renders as a plain
+      checkbox list.
+    </p>
     <VTreeSelect
       v-model="selectedFlat"
       :options="flatCategories"

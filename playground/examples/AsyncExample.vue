@@ -36,8 +36,8 @@ async function onUserSearch(q: string) {
   <article class="card">
     <h2>Async — debounced search</h2>
     <p>
-      <code>:debounce="350"</code> waits for the user to stop typing before
-      firing <code>@search</code>, so you only make one request per pause.
+      <code>:debounce="350"</code> waits for the user to stop typing before firing
+      <code>@search</code>, so you only make one request per pause.
     </p>
     <VSelect
       v-model="selectedUser"

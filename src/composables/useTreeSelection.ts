@@ -36,9 +36,7 @@ export interface UseTreeSelectionReturn<T> {
  * size (hundreds of nodes) this is cheap, and avoids the bug class of
  * cached-state-getting-out-of-sync after async option reloads.
  */
-export function useTreeSelection<T>(
-  opts: UseTreeSelectionOptions<T>,
-): UseTreeSelectionReturn<T> {
+export function useTreeSelection<T>(opts: UseTreeSelectionOptions<T>): UseTreeSelectionReturn<T> {
   const selectedValues = computed<unknown[]>(() => {
     const value = opts.modelValue.value
     if (value == null || value === '') return []
@@ -103,9 +101,7 @@ export function useTreeSelection<T>(
     const current = selectedValues.value
     if (state === 'checked') {
       // Remove every leaf under this branch.
-      const next = current.filter(
-        (v) => !leafValues.some((lv) => valuesEqual(v, lv)),
-      )
+      const next = current.filter((v) => !leafValues.some((lv) => valuesEqual(v, lv)))
       opts.emitUpdate(next)
       // Emit deselect for each leaf that was actually selected.
       for (const child of flattenTree(node.children)) {
