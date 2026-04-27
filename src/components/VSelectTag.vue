@@ -22,12 +22,12 @@ function onRemove(event: MouseEvent) {
 </script>
 
 <template>
-  <span class="vs-tag" :data-value="String(option.value)">
-    <span class="vs-tag__label">{{ option.label }}</span>
+  <span class="vselect-tag" :data-value="String(option.value)">
+    <span class="vselect-tag-label">{{ option.label }}</span>
     <button
       v-if="!disabled"
       type="button"
-      class="vs-tag__remove"
+      class="vselect-tag-remove"
       :aria-label="removeLabel ?? `Remove ${option.label}`"
       tabindex="-1"
       @mousedown="onRemove"

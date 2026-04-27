@@ -19,7 +19,7 @@ function setup(initial: unknown, mode: 'single' | 'multiple' | 'tags' = 'single'
     emitDeselect,
   })
 
-  return { ...api, modelValue, emitUpdate, emitSelect, emitDeselect }
+  return { ...api, options, modelValue, emitUpdate, emitSelect, emitDeselect }
 }
 
 describe('useSelection — single mode', () => {

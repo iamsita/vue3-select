@@ -23,11 +23,11 @@ const country = ref<string | null>('fr')
     >
       <template #option="{ option }">
         <span class="flag">{{ flagFor((option.raw as Country).code) }}</span>
-        <span class="vs-option__label">{{ option.label }}</span>
-        <span class="vs-option__hint">{{ (option.raw as Country).region }}</span>
+        <span class="vselect-option-label">{{ option.label }}</span>
+        <span class="vselect-option-hint">{{ (option.raw as Country).region }}</span>
       </template>
-      <template #selection-text="{ selected }">
-        <span class="vs-control__single">
+      <template #value="{ selected }">
+        <span class="vselect-single">
           <span class="flag">{{ flagFor((selected[0]?.raw as Country | undefined)?.code ?? '') }}</span>
           {{ selected[0]?.label }}
         </span>

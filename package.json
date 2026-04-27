@@ -2,23 +2,40 @@
   "name": "@matat/vue3-select",
   "version": "0.1.0",
   "description": "A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags, async, grouped — one component, zero surprises.",
+  "author": "Matat <hello@matat.io>",
+  "license": "MIT",
+  "homepage": "https://github.com/matat/vue3-select#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matat/vue3-select.git"
+  },
+  "bugs": {
+    "url": "https://github.com/matat/vue3-select/issues"
+  },
   "type": "module",
   "main": "./dist/vue3-select.cjs",
   "module": "./dist/vue3-select.mjs",
-  "types": "./dist/src/lib/index.d.ts",
+  "unpkg": "./dist/vue3-select.global.js",
+  "jsdelivr": "./dist/vue3-select.global.js",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/src/lib/index.d.ts",
+      "types": "./dist/src/index.d.ts",
       "import": "./dist/vue3-select.mjs",
-      "require": "./dist/vue3-select.cjs"
+      "require": "./dist/vue3-select.cjs",
+      "default": "./dist/vue3-select.mjs"
     },
+    "./global": "./dist/vue3-select.global.js",
     "./style.css": "./dist/vue3-select.css",
-    "./scss": "./src/lib/styles/index.scss",
-    "./scss/*": "./src/lib/styles/*"
+    "./scss": "./src/styles/index.scss",
+    "./scss/*": "./src/styles/*"
   },
   "files": [
     "dist",
-    "src/lib/styles"
+    "src/styles",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "sideEffects": [
     "**/*.css",
@@ -30,34 +47,51 @@
     "select",
     "combobox",
     "multiselect",
+    "tags",
     "autocomplete",
     "typescript",
     "accessible",
-    "headless"
+    "a11y",
+    "headless",
+    "form",
+    "dropdown"
   ],
-  "license": "MIT",
   "scripts": {
-    "dev": "vite",
-    "preview": "vite preview",
-    "build": "run-s type-check build:lib",
-    "build:lib": "BUILD_TARGET=lib vite build",
-    "build:demo": "vite build",
+    "dev": "vite --config vite.config.playground.ts",
+    "preview": "vite preview --config vite.config.playground.ts --outDir dist-demo",
+    "build": "run-s type-check build:lib build:umd",
+    "build:lib": "vite build",
+    "build:umd": "vite build --config vite.config.umd.ts",
+    "build:demo": "vite build --config vite.config.playground.ts --outDir dist-demo",
     "type-check": "vue-tsc --build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli \"src/**/*.{ts,vue,scss}\" \"playground/**/*.{ts,vue}\" \"tests/**/*.ts\"",
+    "prepublishOnly": "run-s test build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": false
+  },
+  "dependencies": {
+    "@floating-ui/vue": "^1.0.0"
   },
   "peerDependencies": {
-    "@floating-ui/vue": "^1.0.0",
     "vue": "^3.3.0"
   },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": false
+    }
+  },
   "devDependencies": {
-    "@floating-ui/vue": "^1.1.11",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.2",
     "@vitejs/plugin-vue": "^6.0.6",
-    "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vitest/coverage-v8": "^4.1.5",
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "^2.4.8",

@@ -40,7 +40,9 @@ export interface VSelectProps<T extends OptionLike = OptionLike> {
   filter?: FilterFn<T>
   caseSensitive?: boolean
 
-  noOptionsText?: string
+  /** Shown in the menu when the option list is empty. */
+  emptyText?: string
+  /** Shown when search yields no matches. Falls back to `emptyText`. */
   noResultsText?: string
   loadingText?: string
 

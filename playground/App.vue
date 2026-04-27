@@ -174,7 +174,7 @@ header {
 }
 .user-row .muted {
   font-size: 0.8em;
-  color: var(--vs-text-muted);
+  color: var(--vselect-text-muted);
 }
 .flag {
   font-size: 1.2em;

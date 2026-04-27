@@ -1,53 +1,58 @@
-.vs-indicator {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  border-radius: var(--vs-radius-sm);
-  color: var(--vs-text-muted);
-  cursor: pointer;
-  transition: color var(--vs-transition), background-color var(--vs-transition), transform var(--vs-transition);
-
-  &:hover {
-    color: var(--vs-text);
-    background: var(--vs-bg-hover);
+@mixin styles {
+  .vselect-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: var(--vselect-radius-sm);
+    color: var(--vselect-text-muted);
+    cursor: pointer;
+    transition:
+      color var(--vselect-transition),
+      background-color var(--vselect-transition),
+      transform var(--vselect-transition);
+  
+    &:hover {
+      color: var(--vselect-text);
+      background: var(--vselect-bg-hover);
+    }
+  
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--vselect-focus-ring);
+    }
+  
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  
+    .vselect.is-disabled & {
+      cursor: not-allowed;
+      pointer-events: none;
+    }
   }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: var(--vs-focus-ring);
+  
+  .vselect-chevron {
+    transition: transform var(--vselect-transition);
+  
+    .vselect.is-open & {
+      transform: rotate(180deg);
+    }
   }
-
-  svg {
+  
+  .vselect-spinner {
+    display: inline-block;
     width: 16px;
     height: 16px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: vselect-spin 0.7s linear infinite;
+    color: var(--vselect-text-muted);
   }
-
-  .vs--disabled & {
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-}
-
-.vs-indicator__chevron {
-  transition: transform var(--vs-transition);
-
-  .vs--open & {
-    transform: rotate(180deg);
-  }
-}
-
-.vs-spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: vs-spinner 0.7s linear infinite;
-  color: var(--vs-text-muted);
 }

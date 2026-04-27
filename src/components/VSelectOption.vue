@@ -8,7 +8,7 @@ defineProps<{
   option: NormalizedOption<T>
   selected: boolean
   active: boolean
-  /** DOM id used by `aria-activedescendant` on the combobox. */
+  /** DOM id used by the combobox's `aria-activedescendant`. */
   domId: string
 }>()
 
@@ -28,7 +28,7 @@ function onMousedown(event: MouseEvent, option: NormalizedOption<T>) {
 <template>
   <div
     :id="domId"
-    class="vs-option"
+    class="vselect-option"
     role="option"
     :class="{
       'is-active': active,
@@ -41,8 +41,8 @@ function onMousedown(event: MouseEvent, option: NormalizedOption<T>) {
     @mousedown="onMousedown($event, option)"
   >
     <slot :option="option" :selected="selected" :active="active" :disabled="option.disabled || false">
-      <span class="vs-option__label">{{ option.label }}</span>
-      <span v-if="selected" class="vs-option__check">
+      <span class="vselect-option-label">{{ option.label }}</span>
+      <span v-if="selected" class="vselect-option-check">
         <CheckIcon />
       </span>
     </slot>

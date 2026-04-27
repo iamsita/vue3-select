@@ -19,11 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optional `teleportTo` for body-mounted menus.
 - ARIA-1.2 combobox + listbox semantics.
 - Keyboard navigation: ↑/↓, Home, End, Enter, Esc, Tab, Backspace.
-- Slot API: `prepend`, `append`, `selection`, `selection-text`, `option`,
-  `group-label`, `no-options`, `no-results`, `loading`, `indicator`, `clear`,
-  `create`.
+- Slot API: `prefix`, `suffix`, `tag`, `value`, `option`, `optiongroup`,
+  `empty` (with `mode: 'no-options' | 'no-results'`), `loader`,
+  `dropdownicon`, `clearicon`, `create`.
 - Native form integration via `name` prop (hidden inputs in FormData).
-- Themeable via CSS custom properties — light, dark, and `auto` themes.
+- Themeable via CSS custom properties (`--vselect-*` namespace) — light, dark,
+  and `auto` themes. Stylesheet wrapped in `@layer vselect` so consumer
+  overrides win without specificity wars.
 - Accent presets: emerald, rose (SCSS subpath imports).
 - Headless composables: `useSelection`, `useOptionFilter`, `useKeyboardNav`,
   `useStableId`.

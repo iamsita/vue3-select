@@ -1,30 +1,43 @@
-// Public stylesheet entry. Consumers import either the compiled CSS
-// (`@matat/vue3-select/style.css`) or this SCSS file via the `./scss`
-// subpath export to participate in their own design-token build.
+// Public stylesheet entry. Every rule is wrapped in `@layer vselect` so
+// consumer overrides — even those written without `@layer` themselves —
+// naturally win the cascade without specificity wars.
 
 @use 'tokens' as tokens;
-@use 'base/animations';
-@use 'base/root';
-@use 'parts/control';
-@use 'parts/tag';
-@use 'parts/search';
-@use 'parts/indicator';
-@use 'parts/menu';
-@use 'parts/option';
-@use 'parts/group';
+@use 'base/animations' as animations;
+@use 'base/root' as root;
+@use 'parts/control' as control;
+@use 'parts/tag' as tag;
+@use 'parts/search' as search;
+@use 'parts/indicator' as indicator;
+@use 'parts/menu' as menu;
+@use 'parts/option' as option;
+@use 'parts/group' as group;
 
-// Default tokens applied to the component root. Scoped to `.vs` so the
-// custom properties don't leak into surrounding CSS systems.
-.vs {
-  @include tokens.tokens;
-}
+@layer vselect {
+  @include animations.styles;
+  @include root.styles;
+  @include control.styles;
+  @include tag.styles;
+  @include search.styles;
+  @include indicator.styles;
+  @include menu.styles;
+  @include option.styles;
+  @include group.styles;
 
-.vs--theme-dark {
-  @include tokens.dark-tokens;
-}
+  // Default tokens applied to the component root. Scoped to `.vselect` so
+  // the custom properties don't leak into surrounding CSS.
+  .vselect {
+    @include tokens.tokens;
+  }
 
-@media (prefers-color-scheme: dark) {
-  .vs--theme-auto {
+  // Theme variants — apply via class on the root.
+  .vselect--dark {
     @include tokens.dark-tokens;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .vselect--auto {
+      @include tokens.dark-tokens;
+    }
   }
 }

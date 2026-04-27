@@ -12,14 +12,15 @@ import type { NormalizedOption, OptionLike } from '../types/option'
 import type { VSelectProps } from '../types/props'
 import type { VSelectInstance } from '../types/emits'
 import type {
-  ClearSlotProps,
+  ClearIconSlotProps,
   CreateSlotProps,
+  DropdownIconSlotProps,
   EmptySlotProps,
-  GroupSlotProps,
-  IndicatorSlotProps,
+  LoaderSlotProps,
+  OptionGroupSlotProps,
   OptionSlotProps,
-  SelectionSlotProps,
-  SelectionTextSlotProps,
+  TagSlotProps,
+  ValueSlotProps,
 } from '../types/slots'
 import { normalize } from '../core/normalize'
 import { useOptionFilter } from '../composables/useOptionFilter'
@@ -50,17 +51,18 @@ const props = withDefaults(defineProps<VSelectProps<T>>(), {
   maxVisibleTags: undefined,
   maxSelections: undefined,
   taggable: false,
+  filter: undefined,
   caseSensitive: false,
-  noOptionsText: 'No options',
-  noResultsText: 'No results',
+  emptyText: 'No options',
+  noResultsText: undefined,
   loadingText: 'Loading…',
   size: 'md',
+  theme: 'light',
   ariaLabel: undefined,
   teleportTo: false,
   name: undefined,
   required: false,
   id: undefined,
-  theme: 'light',
 })
 
 const emit = defineEmits<{
@@ -76,7 +78,7 @@ const emit = defineEmits<{
   (e: 'search', query: string): void
 }>()
 
-const baseId = computed(() => props.id ?? useStableId('vs'))
+const baseId = computed(() => props.id ?? useStableId('vselect'))
 const listboxId = computed(() => `${baseId.value}-listbox`)
 const searchId = computed(() => `${baseId.value}-search`)
 
@@ -92,7 +94,6 @@ const modelRef = computed(() => props.modelValue)
 const modeRef = computed(() => props.mode)
 const maxSelectionsRef = computed(() => props.maxSelections)
 
-// Normalised option list — recomputed only when inputs change.
 const normalizedOptions = computed<NormalizedOption<T>[]>(() =>
   normalize(props.options, {
     optionValue: props.optionValue,
@@ -127,11 +128,12 @@ const {
 const { filtered } = useOptionFilter<T>({
   options: normalizedOptions,
   query,
+  filter: props.filter,
   caseSensitive: computed(() => props.caseSensitive),
 })
 
-const closeOnSelectResolved = computed(() =>
-  props.closeOnSelect ?? props.mode === 'single',
+const closeOnSelectResolved = computed(
+  () => props.closeOnSelect ?? props.mode === 'single',
 )
 
 const taggableRef = computed(() => props.taggable || props.mode === 'tags')
@@ -180,8 +182,8 @@ const { onKeydown } = useKeyboardNav<T>({
   createFromQuery,
 })
 
-// Floating UI — only initialised when teleporting since otherwise the menu is
-// a sibling of the control and CSS flow handles layout.
+// Floating UI — only initialised when teleporting; otherwise the menu is a
+// sibling of the control and CSS flow handles layout.
 const useFloatingMenu = computed(() => props.teleportTo !== false)
 
 const { floatingStyles, update: updateFloating } = useFloating(controlEl, menuEl, {
@@ -206,10 +208,8 @@ watch(isOpen, (open) => {
     emit('open')
     nextTick(() => {
       if (props.searchable && searchEl.value) searchEl.value.focus()
-      // Pre-select first non-disabled option for keyboard users.
       if (activeIndex.value === -1 && filtered.value.length > 0) {
-        const firstEnabled = filtered.value.findIndex((o) => !o.disabled)
-        activeIndex.value = firstEnabled
+        activeIndex.value = filtered.value.findIndex((o) => !o.disabled)
       }
       if (useFloatingMenu.value) updateFloating()
     })
@@ -221,15 +221,12 @@ watch(isOpen, (open) => {
 watch(query, (q) => {
   emit('update:search', q)
   emit('search', q)
-  // When the user types, reset highlight to the first match. This keeps
-  // Enter responsive — otherwise the cursor lingers on a now-hidden index.
   nextTick(() => {
     if (filtered.value.length === 0) activeIndex.value = -1
     else activeIndex.value = filtered.value.findIndex((o) => !o.disabled)
   })
 })
 
-// Click outside — closes the menu unless the click is on the control itself.
 function onDocumentPointerDown(event: PointerEvent) {
   if (!isOpen.value) return
   const target = event.target as Node
@@ -249,16 +246,11 @@ onBeforeUnmount(() => {
 
 function onControlMousedown(event: MouseEvent) {
   if (props.disabled) return
-  // Don't steal focus from clear / remove buttons.
   const target = event.target as HTMLElement
-  if (target.closest('.vs-tag__remove, .vs-indicator')) return
-  // The search input handles its own focus; if it exists we let the click
-  // pass through so the caret lands at the click position.
+  if (target.closest('.vselect-tag-remove, .vselect-indicator')) return
   if (target.tagName === 'INPUT') return
   event.preventDefault()
-  if (props.searchable && searchEl.value) {
-    searchEl.value.focus()
-  }
+  if (props.searchable && searchEl.value) searchEl.value.focus()
   toggle()
 }
 
@@ -273,8 +265,6 @@ function onFocus(event: FocusEvent) {
 }
 
 function onBlur(event: FocusEvent) {
-  // Defer the actual blur so clicking inside the menu (which steals focus)
-  // doesn't immediately collapse the dropdown.
   requestAnimationFrame(() => {
     if (!rootEl.value?.contains(document.activeElement)) {
       focused.value = false
@@ -283,9 +273,7 @@ function onBlur(event: FocusEvent) {
   })
 }
 
-function onOptionMousedown(event: MouseEvent, option: NormalizedOption<T>) {
-  // Mousedown rather than click — fires before blur, keeping focus inside.
-  event.preventDefault()
+function onOptionPick(option: NormalizedOption<T>) {
   if (option.disabled) return
   select(option)
   if (closeOnSelectResolved.value) {
@@ -309,7 +297,6 @@ function onTagRemove(option: NormalizedOption<T>) {
   deselect(option)
 }
 
-// Group options by their `group` key while preserving original order.
 interface RenderRow {
   type: 'group' | 'option'
   group?: string
@@ -344,21 +331,29 @@ const overflowTagCount = computed(() => {
 
 const hasSelection = computed(() => selectedOptions.value.length > 0)
 
-const showSearchInput = computed(() => props.searchable)
+const emptyMode = computed<'no-options' | 'no-results'>(() =>
+  query.value ? 'no-results' : 'no-options',
+)
+
+const emptyMessage = computed(() => {
+  if (query.value) return props.noResultsText ?? props.emptyText
+  return props.emptyText
+})
 
 const rootClass = computed(() => [
-  'vs',
-  `vs--size-${props.size}`,
-  `vs--theme-${props.theme}`,
+  'vselect',
+  `vselect--${props.size}`,
+  props.theme === 'dark' && 'vselect--dark',
+  props.theme === 'auto' && 'vselect--auto',
   {
-    'vs--open': isOpen.value,
-    'vs--focused': focused.value,
-    'vs--disabled': props.disabled,
-    'vs--multi': isMulti.value,
-    'vs--single': !isMulti.value,
-    'vs--searchable': props.searchable,
-    'vs--loading': props.loading,
-    'vs--has-value': hasSelection.value,
+    'is-open': isOpen.value,
+    'is-focused': focused.value,
+    'is-disabled': props.disabled,
+    'is-multi': isMulti.value,
+    'is-single': !isMulti.value,
+    'is-searchable': props.searchable,
+    'is-loading': props.loading,
+    'has-value': hasSelection.value,
   },
 ])
 
@@ -384,9 +379,6 @@ defineExpose<VSelectInstance>({
   },
 })
 
-// Native form integration: hidden input(s) carry the value into FormData so
-// the consumer can drop the component into a plain <form> without writing
-// extra wiring.
 const hiddenInputValues = computed<string[]>(() => {
   if (!props.name) return []
   return selectedOptions.value.map((o) => {
@@ -397,7 +389,6 @@ const hiddenInputValues = computed<string[]>(() => {
   })
 })
 
-// Autofocus is honoured at mount; we use a watcher to handle prop change too.
 watch(
   () => props.autofocus,
   (auto) => {
@@ -406,20 +397,20 @@ watch(
   { immediate: true },
 )
 
-// Slot prop bag — typed via the public slot interfaces so consumers get
-// IDE autocomplete on every override.
 defineSlots<{
-  prepend?: () => unknown
-  append?: () => unknown
-  selection?: (props: SelectionSlotProps<T>) => unknown
-  'selection-text'?: (props: SelectionTextSlotProps<T>) => unknown
+  prefix?: () => unknown
+  suffix?: () => unknown
+  /** Per-tag rendering in multi/tags mode. */
+  tag?: (props: TagSlotProps<T>) => unknown
+  /** Whole-value rendering — replaces the control's value area. */
+  value?: (props: ValueSlotProps<T>) => unknown
   option?: (props: OptionSlotProps<T>) => unknown
-  'group-label'?: (props: GroupSlotProps) => unknown
-  'no-options'?: (props: EmptySlotProps) => unknown
-  'no-results'?: (props: EmptySlotProps) => unknown
-  loading?: () => unknown
-  indicator?: (props: IndicatorSlotProps) => unknown
-  clear?: (props: ClearSlotProps) => unknown
+  optiongroup?: (props: OptionGroupSlotProps) => unknown
+  /** Empty state — receives `mode: 'no-options' | 'no-results'`. */
+  empty?: (props: EmptySlotProps) => unknown
+  loader?: (props: LoaderSlotProps) => unknown
+  dropdownicon?: (props: DropdownIconSlotProps) => unknown
+  clearicon?: (props: ClearIconSlotProps) => unknown
   create?: (props: CreateSlotProps) => unknown
 }>()
 </script>
@@ -434,7 +425,7 @@ defineSlots<{
   >
     <div
       ref="controlEl"
-      class="vs-control"
+      class="vselect-control"
       role="combobox"
       :aria-expanded="isOpen"
       :aria-controls="listboxId"
@@ -448,58 +439,57 @@ defineSlots<{
       @mousedown="onControlMousedown"
       @keydown="!searchable && onKeydown($event)"
     >
-      <slot name="prepend" />
+      <slot name="prefix" />
 
-      <div class="vs-control__values">
-        <!-- Multi / tags rendering -->
-        <template v-if="isMulti">
+      <div class="vselect-values">
+        <!-- value slot — full override of the value display area. -->
+        <slot
+          v-if="$slots.value && hasSelection && !query"
+          name="value"
+          :selected="selectedOptions"
+          :is-multi="isMulti"
+        />
+
+        <!-- Default rendering: tags in multi/tags mode. -->
+        <template v-else-if="isMulti">
           <template v-for="option in visibleTags" :key="option.id">
             <slot
-              name="selection"
+              name="tag"
               :option="option"
               :remove="() => deselect(option)"
               :disabled="disabled"
             >
-              <VSelectTag
-                :option="option"
-                :disabled="disabled"
-                @remove="onTagRemove"
-              />
+              <VSelectTag :option="option" :disabled="disabled" @remove="onTagRemove" />
             </slot>
           </template>
-          <span v-if="overflowTagCount > 0" class="vs-tag vs-tag--overflow">
+          <span v-if="overflowTagCount > 0" class="vselect-tag vselect-tag--overflow">
             +{{ overflowTagCount }}
           </span>
         </template>
 
-        <!-- Single rendering: show the selected label only when the user isn't typing. -->
+        <!-- Default rendering: single label. -->
         <template v-else-if="hasSelection && !query">
-          <slot
-            name="selection-text"
-            :selected="selectedOptions"
-          >
-            <span class="vs-control__single">{{ selectedOptions[0]?.label }}</span>
-          </slot>
+          <span class="vselect-single">{{ selectedOptions[0]?.label }}</span>
         </template>
 
-        <!-- Placeholder shows when no selection and no active query. -->
+        <!-- Placeholder. -->
         <span
           v-if="!hasSelection && !query"
-          class="vs-control__placeholder"
+          class="vselect-placeholder"
         >{{ placeholder }}</span>
 
+        <!-- Search input. -->
         <input
-          v-if="showSearchInput"
+          v-if="searchable"
           :id="searchId"
           ref="searchEl"
-          class="vs-search"
-          :class="{ 'vs-search--hidden': !isMulti && hasSelection && !isOpen }"
+          class="vselect-search"
+          :class="{ 'is-hidden': !isMulti && hasSelection && !isOpen }"
           type="text"
           autocomplete="off"
           autocapitalize="off"
           spellcheck="false"
           :value="query"
-          :placeholder="hasSelection ? '' : ''"
           :disabled="disabled"
           :aria-controls="listboxId"
           :aria-autocomplete="'list'"
@@ -509,14 +499,18 @@ defineSlots<{
         />
       </div>
 
-      <div class="vs-control__indicators">
-        <slot v-if="loading" name="loading">
-          <span class="vs-spinner" aria-hidden="true" />
+      <div class="vselect-indicators">
+        <slot v-if="loading" name="loader" :in-menu="false">
+          <span class="vselect-spinner" aria-hidden="true" />
         </slot>
-        <slot v-else-if="clearable && hasSelection && !disabled" name="clear" :clear="clear">
+        <slot
+          v-else-if="clearable && hasSelection && !disabled"
+          name="clearicon"
+          :clear="clear"
+        >
           <button
             type="button"
-            class="vs-indicator"
+            class="vselect-indicator"
             aria-label="Clear selection"
             tabindex="-1"
             @mousedown="onClearClick"
@@ -524,28 +518,28 @@ defineSlots<{
             <CloseIcon />
           </button>
         </slot>
-        <slot name="indicator" :open="isOpen">
-          <span class="vs-indicator vs-indicator--chevron" aria-hidden="true">
-            <ChevronDownIcon class="vs-indicator__chevron" />
+        <slot name="dropdownicon" :open="isOpen">
+          <span class="vselect-indicator" aria-hidden="true">
+            <ChevronDownIcon class="vselect-chevron" />
           </span>
         </slot>
       </div>
 
-      <slot name="append" />
+      <slot name="suffix" />
 
       <!-- Hidden inputs for native form submission. -->
       <template v-if="name">
         <input
           v-for="(val, i) in hiddenInputValues"
           :key="i"
-          class="vs-hidden-input"
+          class="vselect-hidden-input"
           type="hidden"
           :name="isMulti ? `${name}[]` : name"
           :value="val"
         />
         <input
           v-if="hiddenInputValues.length === 0"
-          class="vs-hidden-input"
+          class="vselect-hidden-input"
           type="hidden"
           :name="name"
           :required="required"
@@ -558,49 +552,38 @@ defineSlots<{
       :is="teleportTarget ? 'Teleport' : 'div'"
       v-if="isOpen"
       :to="teleportTarget || undefined"
-      :style="!teleportTarget ? '' : ''"
     >
       <div
         v-show="isOpen"
         :id="listboxId"
         ref="menuEl"
-        class="vs-menu"
+        class="vselect-menu"
         role="listbox"
         :aria-multiselectable="isMulti"
-        :class="[`vs--size-${size}`, `vs--theme-${theme}`]"
+        :class="[
+          `vselect--${size}`,
+          theme === 'dark' && 'vselect--dark',
+          theme === 'auto' && 'vselect--auto',
+        ]"
         :style="useFloatingMenu ? floatingStyles : undefined"
       >
-        <slot v-if="loading" name="loading">
-          <div class="vs-menu__loading">
-            <span class="vs-spinner" />
+        <slot v-if="loading" name="loader" :in-menu="true">
+          <div class="vselect-loading">
+            <span class="vselect-spinner" />
             <span>{{ loadingText }}</span>
           </div>
         </slot>
+
         <template v-else-if="renderRows.length === 0">
-          <slot
-            v-if="query"
-            name="no-results"
-            :query="query"
-          >
-            <div class="vs-menu__empty">{{ noResultsText }}</div>
-          </slot>
-          <slot
-            v-else
-            name="no-options"
-            :query="query"
-          >
-            <div class="vs-menu__empty">{{ noOptionsText }}</div>
+          <slot name="empty" :query="query" :mode="emptyMode">
+            <div class="vselect-empty">{{ emptyMessage }}</div>
           </slot>
         </template>
 
         <template v-else>
           <template v-for="(row, i) in renderRows" :key="i">
-            <div
-              v-if="row.type === 'group'"
-              class="vs-group"
-              role="presentation"
-            >
-              <slot name="group-label" :group="row.group!">
+            <div v-if="row.type === 'group'" class="vselect-group" role="presentation">
+              <slot name="optiongroup" :group="row.group!">
                 {{ row.group }}
               </slot>
             </div>
@@ -611,7 +594,7 @@ defineSlots<{
               :active="activeIndex === row.index"
               :dom-id="`${baseId}-opt-${row.option!.id}`"
               @highlight="activeIndex = row.index!"
-              @pick="(opt, ev) => onOptionMousedown(ev, opt)"
+              @pick="onOptionPick"
             >
               <template v-if="$slots.option" #default="slotProps">
                 <slot name="option" v-bind="slotProps" />
@@ -620,14 +603,9 @@ defineSlots<{
           </template>
         </template>
 
-        <slot
-          v-if="showCreate"
-          name="create"
-          :query="query"
-          :create="createFromQuery"
-        >
+        <slot v-if="showCreate" name="create" :query="query" :create="createFromQuery">
           <div
-            class="vs-menu__create"
+            class="vselect-create"
             role="option"
             @mousedown.prevent="createFromQuery"
           >

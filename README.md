@@ -24,11 +24,40 @@ Single, multi, tags, async, grouped — one component, zero surprises.
 
 ## Install
 
+### npm (TypeScript / bundlers)
+
 ```bash
-npm i @matat/vue3-select @floating-ui/vue
+npm i @matat/vue3-select
 ```
 
-## Quick start
+`@floating-ui/vue` is a regular dependency, so npm pulls it in automatically.
+
+### CDN (no build step)
+
+```html
+<link rel="stylesheet" href="https://unpkg.com/@matat/vue3-select/dist/vue3-select.css" />
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/@matat/vue3-select"></script>
+
+<script>
+  const { createApp, ref } = Vue
+  const { VSelect } = VueSelect
+
+  createApp({
+    components: { VSelect },
+    setup() {
+      return { picked: ref(null), fruits: ['Apple', 'Banana', 'Cherry'] }
+    },
+    template: '<v-select v-model="picked" :options="fruits" />',
+  }).mount('#app')
+</script>
+```
+
+The CDN bundle inlines `@floating-ui/vue` so only Vue itself needs a separate
+script tag.
+
+## Quick start (bundler)
 
 ```ts
 // main.ts
@@ -167,6 +196,9 @@ import { useSelection, useOptionFilter, useKeyboardNav, normalize } from '@matat
 | `maxSelections` | `number` | — | Hard cap on multi-select |
 | `filter` | `FilterFn<T>` | substring | Custom filter function |
 | `caseSensitive` | `boolean` | `false` | Case-sensitive matching |
+| `emptyText` | `string` | `'No options'` | Menu text when there are no options |
+| `noResultsText` | `string` | falls back to `emptyText` | Menu text when search yields nothing |
+| `loadingText` | `string` | `'Loading…'` | Menu text while loading |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Control size |
 | `theme` | `'light' \| 'dark' \| 'auto'` | `'light'` | Theme |
 | `teleportTo` | `string \| HTMLElement \| false` | `false` | Teleport menu target |
@@ -188,9 +220,19 @@ import { useSelection, useOptionFilter, useKeyboardNav, normalize } from '@matat
 
 ### Slots
 
-`prepend`, `append`, `selection`, `selection-text`, `option`, `group-label`,
-`no-options`, `no-results`, `loading`, `indicator`, `clear`, `create`.
-Each slot receives a typed prop bag — see the TS exports for the exact shapes.
+| Slot | Props | Replaces |
+|---|---|---|
+| `prefix` | — | The leading edge of the control |
+| `suffix` | — | The trailing edge of the control |
+| `value` | `{ selected, isMulti }` | The full value display area |
+| `tag` | `{ option, remove, disabled }` | A single tag in multi mode |
+| `option` | `{ option, selected, active, disabled }` | One row in the menu |
+| `optiongroup` | `{ group }` | A group heading row |
+| `empty` | `{ query, mode: 'no-options' \| 'no-results' }` | Empty-state contents |
+| `loader` | `{ inMenu }` | The loading indicator |
+| `dropdownicon` | `{ open }` | The chevron icon |
+| `clearicon` | `{ clear }` | The clear button |
+| `create` | `{ query, create }` | The "Create '<query>'" row in `taggable` mode |
 
 ### Exposed instance methods
 
@@ -205,12 +247,15 @@ All colors, spacing, and motion live as CSS custom properties scoped to `.vs`,
 so you can override at any level without recompiling SCSS:
 
 ```css
-.my-form .vs {
-  --vs-accent: #ec4899;
-  --vs-radius: 12px;
-  --vs-border-focus: #ec4899;
+.my-form .vselect {
+  --vselect-accent: #ec4899;
+  --vselect-radius: 12px;
+  --vselect-border-focus: #ec4899;
 }
 ```
+
+The default stylesheet is wrapped in `@layer vselect`, so consumer rules
+written outside any layer always win without specificity hacks.
 
 Built-in dark mode:
 
@@ -227,7 +272,7 @@ Accent presets ship as separate SCSS files:
 ```
 
 ```vue
-<VSelect class="vs--theme-emerald" />
+<VSelect class="vselect--emerald" />
 ```
 
 ## Accessibility
