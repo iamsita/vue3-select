@@ -19,11 +19,13 @@ export {
   useKeyboardNav,
   useStableId,
   useTreeSelection,
+  useDebounced,
   type UseSelectionOptions,
   type UseOptionFilterOptions,
   type UseKeyboardNavOptions,
   type UseTreeSelectionOptions,
   type UseTreeSelectionReturn,
+  type UseDebouncedReturn,
 } from '@/composables'
 
 // Core helpers — useful for custom filter functions and option pre-processing.

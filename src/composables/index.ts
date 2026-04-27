@@ -7,3 +7,4 @@ export {
   type UseTreeSelectionOptions,
   type UseTreeSelectionReturn,
 } from '@/composables/useTreeSelection'
+export { useDebounced, type UseDebouncedReturn } from '@/composables/useDebounced'

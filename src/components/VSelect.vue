@@ -27,6 +27,7 @@ import { useOptionFilter } from '@/composables/useOptionFilter'
 import { useStableId } from '@/composables/useStableId'
 import { useKeyboardNav } from '@/composables/useKeyboardNav'
 import { useSelection } from '@/composables/useSelection'
+import { useDebounced } from '@/composables/useDebounced'
 import { ChevronDownIcon, CloseIcon } from '@/components/icons'
 import VSelectOption from '@/components/VSelectOption.vue'
 import VSelectTag from '@/components/VSelectTag.vue'
@@ -53,6 +54,7 @@ const props = withDefaults(defineProps<VSelectProps<T>>(), {
   taggable: false,
   filter: undefined,
   caseSensitive: false,
+  debounce: undefined,
   emptyText: 'No options',
   noResultsText: undefined,
   loadingText: 'Loading…',
@@ -92,7 +94,20 @@ const controlEl = ref<HTMLElement | null>(null)
 const menuEl = ref<HTMLElement | null>(null)
 const searchEl = ref<HTMLInputElement | null>(null)
 
+// `query` is the live input value — kept in sync with the DOM input on
+// every keystroke so typing feels instant. `effectiveQuery` is the value
+// that drives filtering and the `search` / `update:search` emits, debounced
+// when the prop is set. They're the same ref when `debounce` is unset / 0.
 const query = ref('')
+const debounceMs = computed(() => props.debounce)
+const {
+  debounced: effectiveQuery,
+  flush: flushSearch,
+  cancel: cancelSearch,
+  force: forceSearch,
+} = useDebounced(query, debounceMs)
+void cancelSearch
+
 const focused = ref(false)
 
 const modelRef = computed(() => props.modelValue)
@@ -132,7 +147,7 @@ const {
 
 const { filtered } = useOptionFilter<T>({
   options: normalizedOptions,
-  query,
+  query: effectiveQuery,
   filter: props.filter,
   caseSensitive: computed(() => props.caseSensitive),
 })
@@ -154,8 +169,10 @@ function selectActive() {
   if (!option) return
   select(option)
   if (closeOnSelectResolved.value) close()
+  // Reset the search and skip the debounce — the menu should reflect the
+  // selection immediately, not after the next trailing edge.
   query.value = ''
-  emit('update:search', '')
+  forceSearch('')
 }
 
 function createFromQuery() {
@@ -163,7 +180,7 @@ function createFromQuery() {
   if (!q) return
   emit('create', q)
   query.value = ''
-  emit('update:search', '')
+  forceSearch('')
 }
 
 function deselectLast() {
@@ -221,7 +238,9 @@ watch(isOpen, (open) => {
   }
 })
 
-watch(query, (q) => {
+// Emits + active-index reset run off the *effective* query so async consumers
+// only see one fire per debounced change, not one per keystroke.
+watch(effectiveQuery, (q) => {
   emit('update:search', q)
   emit('search', q)
   nextTick(() => {
@@ -286,6 +305,7 @@ function onOptionPick(option: NormalizedOption<T>) {
     searchEl.value.focus()
   }
   query.value = ''
+  forceSearch('')
 }
 
 function onClearClick(event: MouseEvent) {
@@ -293,6 +313,7 @@ function onClearClick(event: MouseEvent) {
   event.stopPropagation()
   clear()
   query.value = ''
+  forceSearch('')
   if (props.searchable && searchEl.value) searchEl.value.focus()
 }
 
@@ -377,6 +398,7 @@ defineExpose<VSelectInstance>({
   focus: () => searchEl.value?.focus() ?? controlEl.value?.focus(),
   blur: () => searchEl.value?.blur() ?? controlEl.value?.blur(),
   clear,
+  flushSearch,
   get isOpen() {
     return isOpen.value
   },

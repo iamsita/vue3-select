@@ -76,6 +76,13 @@ export interface VTreeSelectProps<T extends TreeOptionLike = TreeOptionLike> {
   /** Auto-close after every toggle (rarely useful for trees — default false). */
   closeOnSelect?: boolean
 
+  /**
+   * Delay (ms) between the last keystroke and the search emits / filter
+   * recomputation. The input value still updates immediately so typing feels
+   * instant. Mostly useful for very large trees or remote-source variants.
+   */
+  debounce?: number
+
   emptyText?: string
   noResultsText?: string
 
@@ -98,5 +105,7 @@ export interface VTreeSelectInstance {
   selectAll: () => void
   expand: (id: string) => void
   collapse: (id: string) => void
+  /** When `debounce` is set, fires the pending search emit immediately. No-op otherwise. */
+  flushSearch: () => void
   isOpen: boolean
 }

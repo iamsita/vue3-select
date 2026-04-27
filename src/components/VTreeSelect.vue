@@ -19,6 +19,7 @@ import type {
 import { normalizeTree, filterTree, walkTree, flattenTree } from '../core/tree'
 import { useStableId } from '../composables/useStableId'
 import { useTreeSelection } from '../composables/useTreeSelection'
+import { useDebounced } from '../composables/useDebounced'
 import { ChevronDownIcon, CloseIcon } from './icons'
 import VTreeSelectNode from './VTreeSelectNode.vue'
 
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<VTreeSelectProps<T>>(), {
   defaultExpandAll: false,
   showToolbar: true,
   closeOnSelect: false,
+  debounce: undefined,
   emptyText: 'No options',
   noResultsText: undefined,
   size: 'md',
@@ -72,7 +74,16 @@ const searchEl = ref<HTMLInputElement | null>(null)
 
 const isOpen = ref(false)
 const focused = ref(false)
+
+// `query` is the live input value (synced to the DOM input every keystroke);
+// `effectiveQuery` is debounced and drives filterTree + the search emits.
 const query = ref('')
+const debounceMs = computed(() => props.debounce)
+const {
+  debounced: effectiveQuery,
+  flush: flushSearch,
+  force: forceSearch,
+} = useDebounced(query, debounceMs)
 
 // `reactive(new Set(...))` makes Vue track reads/writes — `watch(... { deep })`
 // in the node component picks up id-level mutations without us emitting.
@@ -106,19 +117,24 @@ watch(
 )
 
 const filteredTree = computed(() => {
-  if (!query.value) return tree.value
-  return filterTree(tree.value, query.value)
+  if (!effectiveQuery.value) return tree.value
+  return filterTree(tree.value, effectiveQuery.value)
 })
 
 // While searching, expand every parent in the filtered subtree so matches
 // are visible without an extra click. Restored on query clear by the watcher
 // above re-seeding from `defaultExpandAll`.
 watch(filteredTree, (next, prev) => {
-  if (!query.value) return
+  if (!effectiveQuery.value) return
   if (next === prev) return
   walkTree(next, (n) => {
     if (!n.isLeaf) expanded.add(n.id)
   })
+})
+
+watch(effectiveQuery, (q) => {
+  emit('search', q)
+  emit('update:search', q)
 })
 
 const modelRef = computed(() => props.modelValue)
@@ -206,9 +222,9 @@ function onCollapse(node: NormalizedTreeNode<T>) {
 }
 
 function onSearchInput(event: Event) {
+  // The watcher on `effectiveQuery` handles the emits — running them here
+  // too would fire on every keystroke and defeat the debounce.
   query.value = (event.target as HTMLInputElement).value
-  emit('search', query.value)
-  emit('update:search', query.value)
   if (!isOpen.value) open()
 }
 
@@ -217,6 +233,7 @@ function onClearClick(event: MouseEvent) {
   event.stopPropagation()
   clear()
   query.value = ''
+  forceSearch('')
 }
 
 function onTagRemove(node: NormalizedTreeNode<T>) {
@@ -313,6 +330,7 @@ defineExpose<VTreeSelectInstance>({
   collapse: (id: string) => {
     expanded.delete(id)
   },
+  flushSearch,
   get isOpen() {
     return isOpen.value
   },

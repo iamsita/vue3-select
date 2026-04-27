@@ -40,6 +40,14 @@ export interface VSelectProps<T extends OptionLike = OptionLike> {
   filter?: FilterFn<T>
   caseSensitive?: boolean
 
+  /**
+   * Delay (ms) between the last keystroke and the `search` / `update:search`
+   * emits and the local filter recomputation. The visible input value still
+   * updates immediately so typing feels instant. Set this to drive async
+   * requests without writing your own setTimeout dance.
+   */
+  debounce?: number
+
   /** Shown in the menu when the option list is empty. */
   emptyText?: string
   /** Shown when search yields no matches. Falls back to `emptyText`. */
