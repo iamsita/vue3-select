@@ -273,5 +273,3 @@ npm run build:demo   # static playground build
 ```
 
 ## License
-
-MIT © Matat
