@@ -177,16 +177,24 @@ const picked = ref<number[]>([])
 
 ### Headless usage
 
-The composables that power `<VSelect>` and `<VTreeSelect>` are exported
-individually. Build your own UI on top:
+Every primitive that powers `<VSelect>` and `<VTreeSelect>` is exported
+individually so you can rebuild the UI surface without the bundled chrome:
 
 ```ts
 import {
+  // Selection state machines
   useSelection,
   useTreeSelection,
+  // Option list pipeline
   useOptionFilter,
-  useKeyboardNav,
   useDebounced,
+  // Combobox plumbing — same primitives the SFCs use
+  useKeyboardNav,
+  useFloatingMenu,
+  useOutsideClick,
+  useControlFocus,
+  useStableId,
+  // Core helpers (pure functions, framework-free)
   normalize,
   normalizeTree,
 } from 'vue3-select'

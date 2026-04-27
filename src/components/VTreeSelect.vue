@@ -1,26 +1,21 @@
 <script setup lang="ts" generic="T extends TreeOptionLike = TreeOptionLike">
-import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
-import {
-  autoUpdate,
-  flip,
-  offset,
-  shift,
-  size as floatingSize,
-  useFloating,
-} from '@floating-ui/vue'
-import type { OptionAccessor } from '../types/option'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
+import type { OptionAccessor } from '@/types/option'
 import type {
   NormalizedTreeNode,
   TreeOptionLike,
   VTreeSelectInstance,
   VTreeSelectProps,
-} from '../types/tree'
-import { normalizeTree, filterTree, walkTree, flattenTree } from '../core/tree'
-import { useStableId } from '../composables/useStableId'
-import { useTreeSelection } from '../composables/useTreeSelection'
-import { useDebounced } from '../composables/useDebounced'
-import { ChevronDownIcon, CloseIcon } from './icons'
-import VTreeSelectNode from './VTreeSelectNode.vue'
+} from '@/types/tree'
+import { filterTree, flattenTree, normalizeTree, walkTree } from '@/core/tree'
+import { useControlFocus } from '@/composables/useControlFocus'
+import { useDebounced } from '@/composables/useDebounced'
+import { useFloatingMenu } from '@/composables/useFloatingMenu'
+import { useOutsideClick } from '@/composables/useOutsideClick'
+import { useStableId } from '@/composables/useStableId'
+import { useTreeSelection } from '@/composables/useTreeSelection'
+import { ChevronDownIcon, CloseIcon } from '@/components/icons'
+import VTreeSelectNode from '@/components/VTreeSelectNode.vue'
 
 defineOptions({ name: 'VTreeSelect', inheritAttrs: false })
 
@@ -72,7 +67,6 @@ const menuEl = ref<HTMLElement | null>(null)
 const searchEl = ref<HTMLInputElement | null>(null)
 
 const isOpen = ref(false)
-const focused = ref(false)
 
 // `query` is the live input value (synced to the DOM input every keystroke);
 // `effectiveQuery` is debounced and drives filterTree + the search emits.
@@ -188,7 +182,7 @@ function open() {
   emit('open')
   nextTick(() => {
     if (props.searchable && searchEl.value) searchEl.value.focus()
-    updateFloating()
+    if (isFloating.value) updateFloating()
   })
 }
 
@@ -253,56 +247,17 @@ function onControlMousedown(event: MouseEvent) {
   toggleOpen()
 }
 
-const { floatingStyles, update: updateFloating } = useFloating(controlEl, menuEl, {
-  placement: 'bottom-start',
-  middleware: [
-    offset(6),
-    flip({ padding: 8 }),
-    shift({ padding: 8 }),
-    floatingSize({
-      apply({ rects, elements }) {
-        Object.assign(elements.floating.style, {
-          minWidth: `${rects.reference.width}px`,
-        })
-      },
-    }),
-  ],
-  whileElementsMounted: (...args) => autoUpdate(...args, { animationFrame: false }),
-})
+const teleportToRef = computed(() => props.teleportTo)
+const {
+  styles: floatingStyles,
+  target: teleportTarget,
+  floating: isFloating,
+  update: updateFloating,
+} = useFloatingMenu(controlEl, menuEl, { teleportTo: teleportToRef })
 
-const useFloatingMenu = computed(() => props.teleportTo !== false)
+useOutsideClick({ active: isOpen, contains: [rootEl, menuEl], onOutside: close })
 
-function onDocumentPointerDown(event: PointerEvent) {
-  if (!isOpen.value) return
-  const target = event.target as Node
-  if (rootEl.value?.contains(target)) return
-  if (menuEl.value?.contains(target)) return
-  close()
-}
-
-watch(isOpen, (open) => {
-  if (open) document.addEventListener('pointerdown', onDocumentPointerDown, true)
-  else document.removeEventListener('pointerdown', onDocumentPointerDown, true)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('pointerdown', onDocumentPointerDown, true)
-})
-
-function onFocus() {
-  focused.value = true
-}
-
-function onBlur() {
-  requestAnimationFrame(() => {
-    if (!rootEl.value?.contains(document.activeElement)) focused.value = false
-  })
-}
-
-const teleportTarget = computed(() => {
-  if (props.teleportTo === false || props.teleportTo === undefined) return null
-  return props.teleportTo
-})
+const { focused, onFocusIn, onFocusOut } = useControlFocus({ root: rootEl })
 
 const rootClass = computed(() => [
   'vselect',
@@ -345,8 +300,8 @@ defineExpose<VTreeSelectInstance>({
     ref="rootEl"
     :class="rootClass"
     :data-disabled="disabled || undefined"
-    @focusin="onFocus"
-    @focusout="onBlur"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <div
       ref="controlEl"
@@ -433,7 +388,7 @@ defineExpose<VTreeSelectInstance>({
           theme === 'dark' && 'vselect--dark',
           theme === 'auto' && 'vselect--auto',
         ]"
-        :style="useFloatingMenu ? floatingStyles : undefined"
+        :style="floatingStyles"
       >
         <div v-if="showToolbar && !isEmpty" class="vselect-tree-toolbar">
           <span>{{ selectedValues.length }} selected</span>

@@ -1,13 +1,5 @@
 <script setup lang="ts" generic="T extends OptionLike = OptionLike">
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import {
-  autoUpdate,
-  flip,
-  offset,
-  shift,
-  size as floatingSize,
-  useFloating,
-} from '@floating-ui/vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import type { NormalizedOption, OptionLike } from '@/types/option'
 import type {
   ClearIconSlotProps,
@@ -23,11 +15,14 @@ import type {
   VSelectProps,
 } from '@/types'
 import { normalize } from '@/core/normalize'
-import { useOptionFilter } from '@/composables/useOptionFilter'
-import { useStableId } from '@/composables/useStableId'
-import { useKeyboardNav } from '@/composables/useKeyboardNav'
-import { useSelection } from '@/composables/useSelection'
+import { useControlFocus } from '@/composables/useControlFocus'
 import { useDebounced } from '@/composables/useDebounced'
+import { useFloatingMenu } from '@/composables/useFloatingMenu'
+import { useKeyboardNav } from '@/composables/useKeyboardNav'
+import { useOptionFilter } from '@/composables/useOptionFilter'
+import { useOutsideClick } from '@/composables/useOutsideClick'
+import { useSelection } from '@/composables/useSelection'
+import { useStableId } from '@/composables/useStableId'
 import { ChevronDownIcon, CloseIcon } from '@/components/icons'
 import VSelectOption from '@/components/VSelectOption.vue'
 import VSelectTag from '@/components/VSelectTag.vue'
@@ -105,8 +100,6 @@ const {
   flush: flushSearch,
   force: forceSearch,
 } = useDebounced(query, debounceMs)
-
-const focused = ref(false)
 
 const modelRef = computed(() => props.modelValue)
 const modeRef = computed(() => props.mode)
@@ -200,48 +193,27 @@ const { onKeydown } = useKeyboardNav<T>({
   createFromQuery,
 })
 
-// Floating UI — only initialised when teleporting; otherwise the menu is a
-// sibling of the control and CSS flow handles layout.
-const useFloatingMenu = computed(() => props.teleportTo !== false)
+const teleportToRef = computed(() => props.teleportTo)
+const {
+  styles: floatingStyles,
+  target: teleportTarget,
+  floating: isFloating,
+  update: updateFloating,
+} = useFloatingMenu(controlEl, menuEl, { teleportTo: teleportToRef })
 
-const { floatingStyles, update: updateFloating } = useFloating(controlEl, menuEl, {
-  placement: 'bottom-start',
-  middleware: [
-    offset(6),
-    flip({ padding: 8 }),
-    shift({ padding: 8 }),
-    floatingSize({
-      apply({ rects, elements }) {
-        Object.assign(elements.floating.style, {
-          minWidth: `${rects.reference.width}px`,
-        })
-      },
-    }),
-  ],
-  whileElementsMounted: (...args) => autoUpdate(...args, { animationFrame: false }),
-})
-
-function onDocumentPointerDown(event: PointerEvent) {
-  if (!isOpen.value) return
-  const target = event.target as Node
-  if (rootEl.value?.contains(target)) return
-  if (menuEl.value?.contains(target)) return
-  close()
-}
+useOutsideClick({ active: isOpen, contains: [rootEl, menuEl], onOutside: close })
 
 watch(isOpen, (open) => {
   if (open) {
     emit('open')
-    document.addEventListener('pointerdown', onDocumentPointerDown, true)
     nextTick(() => {
       if (props.searchable && searchEl.value) searchEl.value.focus()
       if (activeIndex.value === -1 && filtered.value.length > 0) {
         activeIndex.value = filtered.value.findIndex((o) => !o.disabled)
       }
-      if (useFloatingMenu.value) updateFloating()
+      if (isFloating.value) updateFloating()
     })
   } else {
-    document.removeEventListener('pointerdown', onDocumentPointerDown, true)
     emit('close')
   }
 })
@@ -255,10 +227,6 @@ watch(effectiveQuery, (q) => {
     if (filtered.value.length === 0) activeIndex.value = -1
     else activeIndex.value = filtered.value.findIndex((o) => !o.disabled)
   })
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('pointerdown', onDocumentPointerDown, true)
 })
 
 function onControlMousedown(event: MouseEvent) {
@@ -292,19 +260,11 @@ function onSearchInput(event: Event) {
   if (!isOpen.value) open()
 }
 
-function onFocus(event: FocusEvent) {
-  focused.value = true
-  emit('focus', event)
-}
-
-function onBlur(event: FocusEvent) {
-  requestAnimationFrame(() => {
-    if (!rootEl.value?.contains(document.activeElement)) {
-      focused.value = false
-      emit('blur', event)
-    }
-  })
-}
+const { focused, onFocusIn, onFocusOut } = useControlFocus({
+  root: rootEl,
+  onFocus: (event) => emit('focus', event),
+  onBlur: (event) => emit('blur', event),
+})
 
 function onOptionPick(option: NormalizedOption<T>) {
   if (option.disabled) return
@@ -397,11 +357,6 @@ const activeOptionId = computed(() => {
   return opt ? `${baseId.value}-opt-${opt.id}` : undefined
 })
 
-const teleportTarget = computed(() => {
-  if (props.teleportTo === false || props.teleportTo === undefined) return null
-  return props.teleportTo
-})
-
 defineExpose<VSelectInstance>({
   open,
   close,
@@ -456,8 +411,8 @@ defineSlots<{
     ref="rootEl"
     :class="rootClass"
     :data-disabled="disabled || undefined"
-    @focusin="onFocus($event as FocusEvent)"
-    @focusout="onBlur($event as FocusEvent)"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
     <div
       ref="controlEl"
@@ -589,7 +544,7 @@ defineSlots<{
           theme === 'dark' && 'vselect--dark',
           theme === 'auto' && 'vselect--auto',
         ]"
-        :style="useFloatingMenu ? floatingStyles : undefined"
+        :style="floatingStyles"
       >
         <slot v-if="loading" name="loader" :in-menu="true">
           <div class="vselect-loading">

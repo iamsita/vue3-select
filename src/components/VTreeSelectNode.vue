@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T = unknown">
 import { computed, ref, watch } from 'vue'
-import type { NormalizedTreeNode, TreeNodeCheckState } from '../types/tree'
-import { ChevronDownIcon } from './icons'
+import type { NormalizedTreeNode, TreeNodeCheckState } from '@/types/tree'
+import { ChevronDownIcon } from '@/components/icons'
 
 defineOptions({ name: 'VTreeSelectNode', inheritAttrs: false })
 

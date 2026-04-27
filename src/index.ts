@@ -14,18 +14,26 @@ export { VueSelectPlugin, type VueSelectPluginOptions } from '@/plugin'
 
 // Composables — re-exported so users can build headless variants on top.
 export {
-  useSelection,
-  useOptionFilter,
+  useControlFocus,
+  useDebounced,
+  useFloatingMenu,
   useKeyboardNav,
+  useOptionFilter,
+  useOutsideClick,
+  useSelection,
   useStableId,
   useTreeSelection,
-  useDebounced,
-  type UseSelectionOptions,
-  type UseOptionFilterOptions,
+  type UseControlFocusOptions,
+  type UseControlFocusReturn,
+  type UseDebouncedReturn,
+  type UseFloatingMenuOptions,
+  type UseFloatingMenuReturn,
   type UseKeyboardNavOptions,
+  type UseOptionFilterOptions,
+  type UseOutsideClickOptions,
+  type UseSelectionOptions,
   type UseTreeSelectionOptions,
   type UseTreeSelectionReturn,
-  type UseDebouncedReturn,
 } from '@/composables'
 
 // Core helpers — useful for custom filter functions and option pre-processing.

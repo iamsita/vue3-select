@@ -34,7 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in both `<VSelect>` and `<VTreeSelect>`, with `flush()`, `cancel()`, and
   `force(value)` escape hatches for async pickers.
 - Headless composables: `useSelection`, `useTreeSelection`, `useOptionFilter`,
-  `useKeyboardNav`, `useStableId`, `useDebounced`.
+  `useKeyboardNav`, `useStableId`, `useDebounced`, `useFloatingMenu`,
+  `useOutsideClick`, `useControlFocus` — the same primitives the SFCs use,
+  exposed for consumers building custom variants.
 - Core helpers: `normalize`, `defaultFilter`, `toggleValue`, `valuesEqual`,
   `escapeRegex`, `readAccessor`, `isPrimitive`, `normalizeTree`, `walkTree`,
   `flattenTree`, `filterTree`, `getLeafValues`, `getAncestorIds`.

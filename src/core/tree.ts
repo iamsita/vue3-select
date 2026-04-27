@@ -1,6 +1,6 @@
-import type { OptionAccessor } from '../types/option'
-import type { NormalizedTreeNode, TreeOptionLike } from '../types/tree'
-import { readAccessor } from './accessor'
+import type { OptionAccessor } from '@/types/option'
+import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree'
+import { readAccessor } from '@/core/accessor'
 
 interface NormalizeTreeConfig<T> {
   optionValue?: OptionAccessor<T, unknown>
