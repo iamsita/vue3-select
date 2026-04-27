@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T = unknown">
-import type { NormalizedOption } from '../types/option'
-import { CloseIcon } from './icons'
+import type { NormalizedOption } from '@/types/option'
+import { CloseIcon } from '@/components/icons'
 
 defineOptions({ name: 'VSelectTag', inheritAttrs: false })
 

@@ -28,7 +28,9 @@ const country = ref<string | null>('fr')
       </template>
       <template #value="{ selected }">
         <span class="vselect-single">
-          <span class="flag">{{ flagFor((selected[0]?.raw as Country | undefined)?.code ?? '') }}</span>
+          <span class="flag">{{
+            flagFor((selected[0]?.raw as Country | undefined)?.code ?? '')
+          }}</span>
           {{ selected[0]?.label }}
         </span>
       </template>

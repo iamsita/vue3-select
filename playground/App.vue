@@ -21,8 +21,8 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
         <span class="tag">v0.1.0</span>
       </div>
       <p class="lead">
-        A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags,
-        async, grouped — one component, zero surprises.
+        A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags, async, grouped
+        — one component, zero surprises.
       </p>
       <label class="theme-switch">
         Theme
@@ -45,8 +45,8 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
 
     <footer>
       <p>
-        Press <kbd>↓</kbd>/<kbd>↑</kbd> to navigate, <kbd>Enter</kbd> to select,
-        <kbd>Esc</kbd> to close, <kbd>⌫</kbd> to remove the last tag.
+        Press <kbd>↓</kbd>/<kbd>↑</kbd> to navigate, <kbd>Enter</kbd> to select, <kbd>Esc</kbd> to
+        close, <kbd>⌫</kbd> to remove the last tag.
       </p>
     </footer>
   </main>
@@ -54,16 +54,23 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
 
 <style>
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-* { box-sizing: border-box; }
-body { margin: 0; }
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
 main {
   min-height: 100vh;
   padding: 48px 24px 80px;
-  transition: background 200ms ease, color 200ms ease;
+  transition:
+    background 200ms ease,
+    color 200ms ease;
 }
 header {
   max-width: 1080px;

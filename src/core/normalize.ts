@@ -1,5 +1,5 @@
-import type { NormalizedOption, OptionAccessor, OptionLike } from '../types/option'
-import { isPrimitive, readAccessor } from './accessor'
+import type { NormalizedOption, OptionAccessor, OptionLike } from '@/types/option'
+import { isPrimitive, readAccessor } from '@/core/accessor'
 
 interface NormalizeConfig<T> {
   optionValue?: OptionAccessor<T, unknown>
@@ -27,7 +27,11 @@ export function normalize<T extends OptionLike>(
         raw: option as T,
       }
     }
-    const value = readAccessor(option, config.optionValue, (option as Record<string, unknown>).value)
+    const value = readAccessor(
+      option,
+      config.optionValue,
+      (option as Record<string, unknown>).value,
+    )
     const label = readAccessor(
       option,
       config.optionLabel,

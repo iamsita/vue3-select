@@ -6,7 +6,7 @@
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--vselect-text-muted);
-  
+
     &:not(:first-child) {
       border-top: var(--vselect-border-width) solid var(--vselect-border);
       margin-top: 4px;

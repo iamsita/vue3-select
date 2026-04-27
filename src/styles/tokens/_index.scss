@@ -58,8 +58,7 @@
 
   // Elevation
   --vselect-shadow-menu:
-    0 6px 24px -8px rgba(15, 23, 42, 0.18),
-    0 2px 6px -2px rgba(15, 23, 42, 0.08);
+    0 6px 24px -8px rgba(15, 23, 42, 0.18), 0 2px 6px -2px rgba(15, 23, 42, 0.08);
 
   // Layering
   --vselect-z-menu: 1000;
@@ -99,7 +98,5 @@
   --vselect-tag-remove-hover: #f87171;
 
   --vselect-focus-ring: 0 0 0 3px rgba(129, 140, 248, 0.28);
-  --vselect-shadow-menu:
-    0 6px 24px -8px rgba(0, 0, 0, 0.5),
-    0 2px 6px -2px rgba(0, 0, 0, 0.3);
+  --vselect-shadow-menu: 0 6px 24px -8px rgba(0, 0, 0, 0.5), 0 2px 6px -2px rgba(0, 0, 0, 0.3);
 }

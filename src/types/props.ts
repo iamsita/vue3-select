@@ -1,5 +1,5 @@
-import type { FilterFn } from './filter'
-import type { OptionLike, SelectMode, SelectSize, SelectTheme } from './option'
+import type { FilterFn } from '@/types/filter'
+import type { OptionLike, SelectMode, SelectSize, SelectTheme } from '@/types/option'
 
 /**
  * Public props surface for `<VSelect>`. Defined here (rather than inline in

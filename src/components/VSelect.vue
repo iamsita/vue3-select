@@ -8,9 +8,7 @@ import {
   size as floatingSize,
   useFloating,
 } from '@floating-ui/vue'
-import type { NormalizedOption, OptionLike } from '../types/option'
-import type { VSelectProps } from '../types/props'
-import type { VSelectInstance } from '../types/emits'
+import type { NormalizedOption, OptionLike } from '@/types/option'
 import type {
   ClearIconSlotProps,
   CreateSlotProps,
@@ -21,15 +19,17 @@ import type {
   OptionSlotProps,
   TagSlotProps,
   ValueSlotProps,
-} from '../types/slots'
-import { normalize } from '../core/normalize'
-import { useOptionFilter } from '../composables/useOptionFilter'
-import { useStableId } from '../composables/useStableId'
-import { useKeyboardNav } from '../composables/useKeyboardNav'
-import { useSelection } from '../composables/useSelection'
-import { ChevronDownIcon, CloseIcon } from './icons'
-import VSelectOption from './VSelectOption.vue'
-import VSelectTag from './VSelectTag.vue'
+  VSelectInstance,
+  VSelectProps,
+} from '@/types'
+import { normalize } from '@/core/normalize'
+import { useOptionFilter } from '@/composables/useOptionFilter'
+import { useStableId } from '@/composables/useStableId'
+import { useKeyboardNav } from '@/composables/useKeyboardNav'
+import { useSelection } from '@/composables/useSelection'
+import { ChevronDownIcon, CloseIcon } from '@/components/icons'
+import VSelectOption from '@/components/VSelectOption.vue'
+import VSelectTag from '@/components/VSelectTag.vue'
 
 defineOptions({ name: 'VSelect', inheritAttrs: false })
 
@@ -137,9 +137,7 @@ const { filtered } = useOptionFilter<T>({
   caseSensitive: computed(() => props.caseSensitive),
 })
 
-const closeOnSelectResolved = computed(
-  () => props.closeOnSelect ?? props.mode === 'single',
-)
+const closeOnSelectResolved = computed(() => props.closeOnSelect ?? props.mode === 'single')
 
 const taggableRef = computed(() => props.taggable || props.mode === 'tags')
 
@@ -458,12 +456,7 @@ defineSlots<{
         <!-- Default rendering: tags in multi/tags mode. -->
         <template v-else-if="isMulti">
           <template v-for="option in visibleTags" :key="option.id">
-            <slot
-              name="tag"
-              :option="option"
-              :remove="() => deselect(option)"
-              :disabled="disabled"
-            >
+            <slot name="tag" :option="option" :remove="() => deselect(option)" :disabled="disabled">
               <VSelectTag :option="option" :disabled="disabled" @remove="onTagRemove" />
             </slot>
           </template>
@@ -478,10 +471,7 @@ defineSlots<{
         </template>
 
         <!-- Placeholder. -->
-        <span
-          v-if="!hasSelection && !query"
-          class="vselect-placeholder"
-        >{{ placeholder }}</span>
+        <span v-if="!hasSelection && !query" class="vselect-placeholder">{{ placeholder }}</span>
 
         <!-- Search input. -->
         <input
@@ -508,11 +498,7 @@ defineSlots<{
         <slot v-if="loading" name="loader" :in-menu="false">
           <span class="vselect-spinner" aria-hidden="true" />
         </slot>
-        <slot
-          v-else-if="clearable && hasSelection && !disabled"
-          name="clearicon"
-          :clear="clear"
-        >
+        <slot v-else-if="clearable && hasSelection && !disabled" name="clearicon" :clear="clear">
           <button
             type="button"
             class="vselect-indicator"
@@ -609,11 +595,7 @@ defineSlots<{
         </template>
 
         <slot v-if="showCreate" name="create" :query="query" :create="createFromQuery">
-          <div
-            class="vselect-create"
-            role="option"
-            @mousedown.prevent="createFromQuery"
-          >
+          <div class="vselect-create" role="option" @mousedown.prevent="createFromQuery">
             Create <strong>{{ query }}</strong>
           </div>
         </slot>

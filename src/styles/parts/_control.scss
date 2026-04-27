@@ -17,33 +17,33 @@
       border-color var(--vselect-transition),
       box-shadow var(--vselect-transition),
       background-color var(--vselect-transition);
-  
+
     .vselect:hover:not(.is-disabled) & {
       border-color: var(--vselect-border-hover);
     }
-  
+
     .vselect.is-focused & {
       border-color: var(--vselect-border-focus);
       box-shadow: var(--vselect-focus-ring);
     }
-  
+
     .vselect.is-disabled & {
       background: var(--vselect-bg-disabled);
       color: var(--vselect-text-disabled);
       cursor: not-allowed;
     }
-  
+
     .vselect--sm & {
       min-height: var(--vselect-control-min-height-sm);
       font-size: var(--vselect-font-size-sm);
     }
-  
+
     .vselect--lg & {
       min-height: var(--vselect-control-min-height-lg);
       font-size: var(--vselect-font-size-lg);
     }
   }
-  
+
   .vselect-values {
     display: flex;
     flex: 1 1 auto;
@@ -52,13 +52,13 @@
     gap: var(--vselect-gap);
     min-width: 0;
   }
-  
+
   .vselect-placeholder {
     color: var(--vselect-text-placeholder);
     pointer-events: none;
     user-select: none;
   }
-  
+
   .vselect-single {
     flex: 1 1 auto;
     min-width: 0;
@@ -66,7 +66,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  
+
   .vselect-indicators {
     display: flex;
     align-items: center;

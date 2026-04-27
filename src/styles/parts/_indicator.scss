@@ -15,36 +15,36 @@
       color var(--vselect-transition),
       background-color var(--vselect-transition),
       transform var(--vselect-transition);
-  
+
     &:hover {
       color: var(--vselect-text);
       background: var(--vselect-bg-hover);
     }
-  
+
     &:focus-visible {
       outline: none;
       box-shadow: var(--vselect-focus-ring);
     }
-  
+
     svg {
       width: 16px;
       height: 16px;
     }
-  
+
     .vselect.is-disabled & {
       cursor: not-allowed;
       pointer-events: none;
     }
   }
-  
+
   .vselect-chevron {
     transition: transform var(--vselect-transition);
-  
+
     .vselect.is-open & {
       transform: rotate(180deg);
     }
   }
-  
+
   .vselect-spinner {
     display: inline-block;
     width: 16px;

@@ -1,5 +1,5 @@
 {
-  "name": "@matat/vue3-select",
+  "name": "vue3-select",
   "version": "0.1.0",
   "description": "A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags, async, grouped — one component, zero surprises.",
   "author": "Matat <hello@matat.io>",
@@ -61,7 +61,7 @@
     "preview": "vite preview --config vite.config.dev.ts --outDir dist-demo",
     "build": "run-s type-check build:lib build:umd",
     "build:lib": "vite build",
-    "build:umd": "BUILD_TARGET=umd vite build",
+    "build:umd": "vite build --mode umd",
     "build:demo": "vite build --config vite.config.dev.ts --outDir dist-demo",
     "type-check": "vue-tsc --build",
     "test": "vitest run",

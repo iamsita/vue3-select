@@ -6,14 +6,14 @@
     font-family: inherit;
     color: var(--vselect-text);
     box-sizing: border-box;
-  
+
     *,
     *::before,
     *::after {
       box-sizing: border-box;
     }
   }
-  
+
   .vselect-hidden-input {
     position: absolute;
     width: 1px;
@@ -27,7 +27,7 @@
     pointer-events: none;
     opacity: 0;
   }
-  
+
   @media (prefers-reduced-motion: reduce) {
     .vselect *,
     .vselect-menu,

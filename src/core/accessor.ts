@@ -1,4 +1,4 @@
-import type { OptionAccessor } from '../types/option'
+import type { OptionAccessor } from '@/types/option'
 
 /**
  * Reads a property or computes a derived value. Accepts a string key OR a
@@ -17,7 +17,5 @@ export function readAccessor<T, R>(
 }
 
 export function isPrimitive(value: unknown): value is string | number | boolean {
-  return (
-    typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
-  )
+  return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
 }

@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type { NormalizedOption } from '../types/option'
+import type { NormalizedOption } from '@/types/option'
 
 export interface UseKeyboardNavOptions<T> {
   isOpen: Ref<boolean>
@@ -26,9 +26,7 @@ export function useKeyboardNav<T>(opts: UseKeyboardNavOptions<T>) {
       opts.activeIndex.value = -1
       return
     }
-    const enabledIndices = visible
-      .map((o, i) => (o.disabled ? -1 : i))
-      .filter((i) => i >= 0)
+    const enabledIndices = visible.map((o, i) => (o.disabled ? -1 : i)).filter((i) => i >= 0)
     if (enabledIndices.length === 0) return
 
     const current = opts.activeIndex.value

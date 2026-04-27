@@ -15,10 +15,7 @@ export const CloseIcon = defineComponent({
           'stroke-linejoin': 'round',
           'aria-hidden': 'true',
         },
-        [
-          h('line', { x1: 5, y1: 5, x2: 15, y2: 15 }),
-          h('line', { x1: 15, y1: 5, x2: 5, y2: 15 }),
-        ],
+        [h('line', { x1: 5, y1: 5, x2: 15, y2: 15 }), h('line', { x1: 15, y1: 5, x2: 5, y2: 15 })],
       )
   },
 })

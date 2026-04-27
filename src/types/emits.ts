@@ -1,4 +1,4 @@
-import type { NormalizedOption } from './option'
+import type { NormalizedOption } from '@/types/option'
 
 export interface VSelectEmits<T = unknown> {
   (e: 'update:modelValue', value: unknown): void
