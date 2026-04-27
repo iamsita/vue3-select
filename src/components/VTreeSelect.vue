@@ -68,8 +68,6 @@ const searchEl = ref<HTMLInputElement | null>(null)
 
 const isOpen = ref(false)
 
-// `query` is the live input value (synced to the DOM input every keystroke);
-// `effectiveQuery` is debounced and drives filterTree + the search emits.
 const query = ref('')
 const debounceMs = computed(() => props.debounce)
 const {
@@ -78,8 +76,6 @@ const {
   force: forceSearch,
 } = useDebounced(query, debounceMs)
 
-// `reactive(new Set(...))` makes Vue track reads/writes — `watch(... { deep })`
-// in the node component picks up id-level mutations without us emitting.
 const expanded = reactive(new Set<string>())
 
 const tree = computed<NormalizedTreeNode<T>[]>(() =>
@@ -91,9 +87,6 @@ const tree = computed<NormalizedTreeNode<T>[]>(() =>
   }),
 )
 
-// Re-seed the expansion set when the tree shape (re)builds. We deliberately
-// don't preserve old ids — they become invalid the moment the underlying
-// option array changes identity.
 watch(
   tree,
   (next) => {
@@ -112,9 +105,6 @@ const filteredTree = computed(() => {
   return filterTree(tree.value, effectiveQuery.value)
 })
 
-// While searching, expand every parent in the filtered subtree so matches
-// are visible without an extra click. Restored on query clear by the watcher
-// above re-seeding from `defaultExpandAll`.
 watch(filteredTree, (next, prev) => {
   if (!effectiveQuery.value) return
   if (next === prev) return
@@ -140,8 +130,6 @@ const { selectedValues, getCheckState, toggle, selectAll, clear } = useTreeSelec
   emitDeselect: (n) => emit('deselect', n),
 })
 
-// Lookup of every leaf node in the current tree, by value. Lets us render
-// labels in the trigger area without re-walking the tree on every paint.
 const leafByValue = computed(() => {
   const map = new Map<unknown, NormalizedTreeNode<T>>()
   walkTree(tree.value, (n) => {
@@ -213,8 +201,6 @@ function onCollapse(node: NormalizedTreeNode<T>) {
 }
 
 function onSearchInput(event: Event) {
-  // The watcher on `effectiveQuery` handles the emits — running them here
-  // too would fire on every keystroke and defeat the debounce.
   query.value = (event.target as HTMLInputElement).value
   if (!isOpen.value) open()
 }
@@ -235,9 +221,6 @@ function onControlMousedown(event: MouseEvent) {
   if (props.disabled) return
   const target = event.target as HTMLElement
   if (target.closest('.vselect-tag-remove, .vselect-indicator')) return
-  // Clicking the search input should open the menu — don't preventDefault
-  // so caret placement still works. Use `open()` rather than the toggle so
-  // an already-open menu doesn't snap shut on the user.
   if (target.tagName === 'INPUT') {
     if (!isOpen.value) open()
     return

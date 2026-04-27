@@ -85,7 +85,7 @@ describe('useTreeSelection — leaves', () => {
 describe('useTreeSelection — parents', () => {
   it('selects every leaf below an unchecked parent', () => {
     const { toggle, findById, emitUpdate } = setup([])
-    toggle(findById(2)) // Frontend → CSS, JS
+    toggle(findById(2))
     expect(emitUpdate).toHaveBeenLastCalledWith([3, 4])
   })
 
@@ -97,7 +97,7 @@ describe('useTreeSelection — parents', () => {
 
   it('promotes an indeterminate parent to fully checked', () => {
     const { toggle, findById, emitUpdate } = setup([3])
-    toggle(findById(2)) // partial → full
+    toggle(findById(2))
     expect(emitUpdate).toHaveBeenLastCalledWith([3, 4])
   })
 
@@ -136,7 +136,7 @@ describe('useTreeSelection — caps and clear', () => {
     walkTree(tree.value, (n) => {
       if (n.value === 7) target = n
     })
-    toggle(target!) // would push to 3 — over the cap
+    toggle(target!)
     expect(emitUpdate).not.toHaveBeenCalled()
   })
 

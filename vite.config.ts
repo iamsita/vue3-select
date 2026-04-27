@@ -4,18 +4,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 
-// Library-build config — produces what consumers install via npm:
-//   ESM (.mjs) for Vite / Webpack / Rollup / Bun / esbuild / modern Node
-//   CJS (.cjs) for tools that still resolve `require(...)` (Jest, older Node)
-//   .d.ts for full TypeScript intellisense
-//
-// We intentionally do not ship a UMD/IIFE bundle — every modern consumer
-// resolves through a bundler, and the CDN drop-in path adds maintenance
-// without paying for itself for an internally-consumed library.
-//
-// The dev server / playground lives in `vite.config.dev.ts` so this file
-// stays focused on what actually ships to consumers.
-
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 
 export default defineConfig({
@@ -34,9 +22,6 @@ export default defineConfig({
   resolve: {
     alias: { '@/': here('./src/') },
   },
-
-  // The lib build must not copy `public/` into `dist/` — that's the dev
-  // server's favicon, and it would otherwise ship inside the tarball.
   publicDir: false,
 
   build: {
@@ -53,15 +38,9 @@ export default defineConfig({
         `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,
       formats: ['es', 'cjs'],
     },
-
-    // Sourcemaps help downstream consumers debug into the published code.
     sourcemap: true,
     cssCodeSplit: false,
-
     rollupOptions: {
-      // Externalise the Vue peer, the floating-ui dep, and the Nuxt-only
-      // build deps so consumers' package managers resolve them — never
-      // inline a peer, and never bundle Nuxt internals into the library.
       external: ['vue', '@floating-ui/vue', '@nuxt/kit', '@nuxt/schema', 'nuxt'],
       output: {
         globals: { vue: 'Vue', '@floating-ui/vue': 'FloatingUIVue' },

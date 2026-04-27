@@ -8,11 +8,6 @@ interface NormalizeConfig<T> {
   optionDisabled?: OptionAccessor<T, boolean>
 }
 
-/**
- * Normalises a heterogeneous option list. Primitives become `{ value, label }`
- * pairs; objects are passed through with the configured accessors. Group
- * keys are preserved so the menu renderer can collapse them into headings.
- */
 export function normalize<T extends OptionLike>(
   options: readonly T[],
   config: NormalizeConfig<T>,

@@ -1,4 +1,3 @@
-// Shared data for playground examples.
 
 export const fruits = ['Apple', 'Banana', 'Cherry', 'Durian', 'Elderberry', 'Fig', 'Grape']
 

@@ -8,7 +8,6 @@ defineProps<{
   option: NormalizedOption<T>
   selected: boolean
   active: boolean
-  /** DOM id used by the combobox's `aria-activedescendant`. */
   domId: string
 }>()
 
@@ -18,7 +17,6 @@ const emit = defineEmits<{
 }>()
 
 function onMousedown(event: MouseEvent, option: NormalizedOption<T>) {
-  // Mousedown rather than click — fires before blur, keeping focus inside.
   event.preventDefault()
   if (option.disabled) return
   emit('pick', option, event)

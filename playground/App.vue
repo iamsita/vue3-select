@@ -18,7 +18,7 @@ const themeFg = computed(() => (theme.value === 'dark' ? '#e2e8f0' : '#0f172a'))
     <header>
       <div class="brand">
         <span class="logo">▲</span>
-        <h1>vue3-select</h1>
+        <h1>@anilkumarthakur/vue3-select</h1>
         <span class="tag">v0.1.0</span>
       </div>
       <p class="lead">
@@ -214,7 +214,6 @@ header {
   line-height: 1;
 }
 footer {
-  /* max-width: 1080px; */
   margin: 60px 0 0;
   font-size: 13px;
   opacity: 0.65;

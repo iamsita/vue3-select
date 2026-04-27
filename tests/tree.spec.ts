@@ -126,7 +126,6 @@ describe('filterTree', () => {
   it('keeps ancestors of matching leaves', () => {
     const tree = normalizeTree(sample, { optionValue: 'id', optionLabel: 'name' })
     const filtered = filterTree(tree, 'docker')
-    // Only "DevOps → Docker" survives.
     expect(filtered).toHaveLength(1)
     expect(filtered[0]?.label).toBe('DevOps')
     expect(filtered[0]?.children).toHaveLength(1)

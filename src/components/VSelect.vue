@@ -75,10 +75,6 @@ const emit = defineEmits<{
   (e: 'search', query: string): void
 }>()
 
-// Resolve once in setup — `useStableId` calls `getCurrentInstance()`, which
-// returns null inside a computed getter, so wrapping this in `computed` would
-// produce a fresh anonymous-counter id on every re-evaluation and detach the
-// aria wiring (listbox / activedescendant) from the rendered DOM ids.
 const fallbackId = useStableId('vselect')
 const baseId = computed(() => props.id ?? fallbackId)
 const listboxId = computed(() => `${baseId.value}-listbox`)
@@ -89,10 +85,6 @@ const controlEl = ref<HTMLElement | null>(null)
 const menuEl = ref<HTMLElement | null>(null)
 const searchEl = ref<HTMLInputElement | null>(null)
 
-// `query` is the live input value — kept in sync with the DOM input on
-// every keystroke so typing feels instant. `effectiveQuery` is the value
-// that drives filtering and the `search` / `update:search` emits, debounced
-// when the prop is set. They're the same ref when `debounce` is unset / 0.
 const query = ref('')
 const debounceMs = computed(() => props.debounce)
 const {
@@ -160,8 +152,6 @@ function selectActive() {
   if (!option) return
   select(option)
   if (closeOnSelectResolved.value) close()
-  // Reset the search and skip the debounce — the menu should reflect the
-  // selection immediately, not after the next trailing edge.
   query.value = ''
   forceSearch('')
 }
@@ -218,8 +208,6 @@ watch(isOpen, (open) => {
   }
 })
 
-// Emits + active-index reset run off the *effective* query so async consumers
-// only see one fire per debounced change, not one per keystroke.
 watch(effectiveQuery, (q) => {
   emit('update:search', q)
   emit('search', q)
@@ -232,19 +220,8 @@ watch(effectiveQuery, (q) => {
 function onControlMousedown(event: MouseEvent) {
   if (props.disabled) return
   const target = event.target as HTMLElement
-  // Tag-remove buttons handle their own clicks and stop propagation, but
-  // guard anyway in case a custom tag slot forgets to.
   if (target.closest('.vselect-tag-remove')) return
-  // Clear button is `.vselect-indicator` too, but stops propagation in its
-  // own mousedown handler — so events reaching here from an indicator are
-  // always the chevron, which should toggle the menu.
 
-  // Clicking the search input *should* open the menu (it currently doesn't,
-  // which makes the trigger feel half-broken in single mode where the input
-  // covers most of the control). Let the browser place the caret as normal
-  // — don't preventDefault — but make sure the menu is open. We use
-  // `open()` rather than `toggle()` so clicking inside an already-open
-  // input doesn't close the menu out from under the user.
   if (target.tagName === 'INPUT') {
     if (!isOpen.value) open()
     return
@@ -391,13 +368,10 @@ watch(
 defineSlots<{
   prefix?: () => unknown
   suffix?: () => unknown
-  /** Per-tag rendering in multi/tags mode. */
   tag?: (props: TagSlotProps<T>) => unknown
-  /** Whole-value rendering — replaces the control's value area. */
   value?: (props: ValueSlotProps<T>) => unknown
   option?: (props: OptionSlotProps<T>) => unknown
   optiongroup?: (props: OptionGroupSlotProps) => unknown
-  /** Empty state — receives `mode: 'no-options' | 'no-results'`. */
   empty?: (props: EmptySlotProps) => unknown
   loader?: (props: LoaderSlotProps) => unknown
   dropdownicon?: (props: DropdownIconSlotProps) => unknown
@@ -433,7 +407,6 @@ defineSlots<{
       <slot name="prefix" />
 
       <div class="vselect-values">
-        <!-- value slot — full override of the value display area. -->
         <slot
           v-if="$slots.value && hasSelection && !query"
           name="value"
@@ -441,7 +414,6 @@ defineSlots<{
           :is-multi="isMulti"
         />
 
-        <!-- Default rendering: tags in multi/tags mode. -->
         <template v-else-if="isMulti">
           <template v-for="option in visibleTags" :key="option.id">
             <slot name="tag" :option="option" :remove="() => deselect(option)" :disabled="disabled">
@@ -453,15 +425,12 @@ defineSlots<{
           </span>
         </template>
 
-        <!-- Default rendering: single label. -->
         <template v-else-if="hasSelection && !query">
           <span class="vselect-single">{{ selectedOptions[0]?.label }}</span>
         </template>
 
-        <!-- Placeholder. -->
         <span v-if="!hasSelection && !query" class="vselect-placeholder">{{ placeholder }}</span>
 
-        <!-- Search input. -->
         <input
           v-if="searchable"
           :id="searchId"
@@ -506,7 +475,6 @@ defineSlots<{
 
       <slot name="suffix" />
 
-      <!-- Hidden inputs for native form submission. -->
       <template v-if="name">
         <input
           v-for="(val, i) in hiddenInputValues"

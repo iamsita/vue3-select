@@ -11,13 +11,6 @@ export interface UseSelectionOptions<T> {
   emitDeselect: (option: NormalizedOption<T>) => void
 }
 
-/**
- * Core selection state machine. Translates between the v-model shape (one
- * value vs an array) and the internal list of selected normalised options
- * the UI renders. We resolve selections against the option list so that, for
- * object options, the rendered selection survives a referential refresh of
- * the same value (e.g. async option list reloads).
- */
 export function useSelection<T>(opts: UseSelectionOptions<T>) {
   const isMulti = computed(() => opts.mode.value !== 'single')
 
@@ -27,24 +20,14 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     return Array.isArray(value) ? value : [value]
   })
 
-  // Set lookup keeps `isSelected` (called once per option per render) at O(1)
-  // average. Object values still match by reference because Set uses
-  // SameValueZero, which behaves identically to `===` for non-NaN values.
   const selectedSet = computed(() => new Set(selectedValues.value))
 
-  // Index options by value so `selectedOptions` can resolve labels in O(n)
-  // total instead of O(n × m) — important when both the option list and the
-  // selected list grow.
   const optionByValue = computed(() => {
     const map = new Map<unknown, NormalizedOption<T>>()
     for (const option of opts.options.value) map.set(option.value, option)
     return map
   })
 
-  /**
-   * If a value has no matching option (common during async loading) we
-   * synthesise a placeholder so the chip/label still renders.
-   */
   const selectedOptions = computed<NormalizedOption<T>[]>(() => {
     const lookup = optionByValue.value
     return selectedValues.value.map((v) => {
@@ -122,7 +105,6 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     else open()
   }
 
-  /** Reset the highlight when the visible list changes underneath us. */
   watch(
     () => opts.options.value.length,
     () => {
