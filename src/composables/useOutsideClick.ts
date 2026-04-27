@@ -9,6 +9,11 @@ export interface UseOutsideClickOptions {
   onOutside: (event: PointerEvent) => void
 }
 
+// SSR-safe DOM check — `document` is undefined on the server, and the
+// `immediate: true` watcher below would crash if it tried to detach a
+// listener it never had a chance to attach.
+const hasDocument = typeof document !== 'undefined'
+
 /**
  * Listens for `pointerdown` events outside a set of elements while `active`
  * is true. We use `pointerdown` rather than `click` so menus close before
@@ -18,6 +23,8 @@ export interface UseOutsideClickOptions {
  * us (the floating menu is a sibling once teleported).
  */
 export function useOutsideClick(opts: UseOutsideClickOptions): void {
+  if (!hasDocument) return
+
   function handler(event: PointerEvent) {
     if (!opts.active.value) return
     const target = event.target as Node | null
