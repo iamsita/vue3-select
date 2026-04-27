@@ -4,9 +4,9 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-// Playground / dev-server config. Drives `npm run dev` and `build:demo`.
-// The library build lives in `vite.config.ts` — keep these two configs
-// separate so neither file accumulates conditional branches.
+// Dev / playground config. Drives `npm run dev` and `npm run build:demo`.
+// The library build lives in `vite.config.ts` — kept separate so neither
+// file mixes "what we ship" with "how we test what we ship".
 export default defineConfig({
   plugins: [vue(), vueDevTools()],
   resolve: {

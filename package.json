@@ -57,12 +57,12 @@
     "dropdown"
   ],
   "scripts": {
-    "dev": "vite --config vite.config.playground.ts",
-    "preview": "vite preview --config vite.config.playground.ts --outDir dist-demo",
+    "dev": "vite --config vite.config.dev.ts",
+    "preview": "vite preview --config vite.config.dev.ts --outDir dist-demo",
     "build": "run-s type-check build:lib build:umd",
     "build:lib": "vite build",
-    "build:umd": "vite build --config vite.config.umd.ts",
-    "build:demo": "vite build --config vite.config.playground.ts --outDir dist-demo",
+    "build:umd": "BUILD_TARGET=umd vite build",
+    "build:demo": "vite build --config vite.config.dev.ts --outDir dist-demo",
     "type-check": "vue-tsc --build",
     "test": "vitest run",
     "test:watch": "vitest",
