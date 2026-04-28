@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { fileURLToPath, URL } from 'node:url'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 
@@ -34,8 +35,8 @@ export default defineConfig({
       {
         text: 'v0.1.0',
         items: [
-          { text: 'Changelog', link: 'https://github.com/matat/vue3-select/blob/master/CHANGELOG.md' },
-          { text: 'npm', link: 'https://www.npmjs.com/package/vue3-select' },
+          { text: 'Changelog', link: 'https://github.com/anilkumarthakur60/vue3-select/blob/master/CHANGELOG.md' },
+          { text: 'npm', link: 'https://www.npmjs.com/package/@anilkumarthakur/vue3-select' },
         ],
       },
     ],
@@ -96,33 +97,45 @@ export default defineConfig({
       ],
     },
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/matat/vue3-select' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/anilkumarthakur60/vue3-select' }],
 
     search: {
       provider: 'local',
     },
 
     editLink: {
-      pattern: 'https://github.com/matat/vue3-select/edit/master/docs/:path',
+      pattern: 'https://github.com/anilkumarthakur60/vue3-select/edit/master/docs/:path',
       text: 'Edit this page on GitHub',
     },
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2026 Matat',
+      copyright: 'Copyright © 2026 Er. Anil Kumar Thakur',
     },
   },
 
   // The docs live in the same repo as the library — alias the package name
   // so example code on every page reads exactly like consumer code.
   vite: {
+    plugins: [vueJsx()],
     resolve: {
       alias: [
         {
-          find: /^vue3-select\/style\.css$/,
+          find: /^@anilkumarthakur\/vue3-select\/style\.css$/,
           replacement: here('../../src/styles/index.scss'),
         },
-        { find: /^vue3-select$/, replacement: here('../../src/index.ts') },
+        {
+          find: /^@anilkumarthakur\/vue3-select\/scss\/(.*)$/,
+          replacement: here('../../src/styles/$1'),
+        },
+        {
+          find: /^@anilkumarthakur\/vue3-select\/nuxt$/,
+          replacement: here('../../src/nuxt.ts'),
+        },
+        {
+          find: /^@anilkumarthakur\/vue3-select$/,
+          replacement: here('../../src/index.ts'),
+        },
         { find: /^@\/(.*)$/, replacement: here('../../src/$1') },
       ],
     },

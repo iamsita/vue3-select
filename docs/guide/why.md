@@ -1,4 +1,4 @@
-# Why vue3-select?
+# Why @anilkumarthakur/vue3-select?
 
 There are plenty of select components for Vue. This one earns its place by
 sweating the parts that other libraries leave fuzzy.
@@ -42,18 +42,23 @@ catches `option-value="cod"` typos and infers slot props correctly:
 
 Every state machine inside the SFCs is also exported as a standalone
 composable. Want a custom command-palette UI? Reuse `useSelection`,
-`useOptionFilter`, `useKeyboardNav`, and skip the bundled chrome.
+`useMenuState`, `useOptionFilter`, `useKeyboardNav`, and skip the bundled
+chrome.
 
 ```ts
 import {
   useSelection,
+  useMenuState,
   useOptionFilter,
   useKeyboardNav,
   useDebounced,
+  useTaggable,
+  useTriggerInteractions,
   useFloatingMenu,
   useOutsideClick,
   useControlFocus,
-} from 'vue3-select'
+  useFormBinding,
+} from '@anilkumarthakur/vue3-select'
 ```
 
 ## Themed without specificity wars
@@ -78,7 +83,8 @@ cascade level, no SCSS recompile required.
 | JS (CJS) | ~9.5 kB |
 | CSS | ~2.8 kB |
 
-Plus a 0.5 kB Nuxt module for one-line setup.
+Plus a Nuxt module for one-line setup. Zero runtime deps beyond
+`@floating-ui/vue`.
 
 ## What it isn't
 

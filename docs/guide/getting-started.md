@@ -1,27 +1,27 @@
 # Getting Started
 
-`vue3-select` is a single component family that covers single, multi, tags,
-grouped, async, and tree pickers — all behind one consistent, generic-typed
-API.
+`@anilkumarthakur/vue3-select` is a single component family that covers
+single, multi, tags, grouped, async, and tree pickers — all behind one
+consistent, generic-typed API.
 
 ## Install
 
 ::: code-group
 
 ```bash [npm]
-npm i vue3-select
+npm i @anilkumarthakur/vue3-select
 ```
 
 ```bash [pnpm]
-pnpm add vue3-select
+pnpm add @anilkumarthakur/vue3-select
 ```
 
 ```bash [yarn]
-yarn add vue3-select
+yarn add @anilkumarthakur/vue3-select
 ```
 
 ```bash [bun]
-bun add vue3-select
+bun add @anilkumarthakur/vue3-select
 ```
 
 :::
@@ -35,8 +35,8 @@ in automatically; `vue` is the only required peer.
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VSelect } from 'vue3-select'
-import 'vue3-select/style.css'
+import { VSelect } from '@anilkumarthakur/vue3-select'
+import '@anilkumarthakur/vue3-select/style.css'
 
 const fruit = ref<string | null>(null)
 </script>
@@ -69,8 +69,8 @@ If you'd rather not import per file, register the plugin once:
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import { VueSelectPlugin } from 'vue3-select'
-import 'vue3-select/style.css'
+import { VueSelectPlugin } from '@anilkumarthakur/vue3-select'
+import '@anilkumarthakur/vue3-select/style.css'
 import App from './App.vue'
 
 createApp(App).use(VueSelectPlugin).mount('#app')
@@ -78,6 +78,21 @@ createApp(App).use(VueSelectPlugin).mount('#app')
 
 `<VSelect>` and `<VTreeSelect>` are then available on every template without
 an explicit `import`.
+
+### Plugin options
+
+```ts
+app.use(VueSelectPlugin, {
+  /** Override the global tag for `<VSelect>` (default: 'VSelect'). */
+  name: 'AppSelect',
+  /** Override the global tag for `<VTreeSelect>` (default: 'VTreeSelect'). */
+  treeName: 'AppTreeSelect',
+  /** Skip registering `<VTreeSelect>` to drop it from the runtime cost. */
+  registerTree: false,
+  /** Also register `VSelectOption` and `VSelectTag` globally (default: false). */
+  registerInternals: true,
+})
+```
 
 ## Next steps
 

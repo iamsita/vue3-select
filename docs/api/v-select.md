@@ -3,7 +3,7 @@
 The flagship component — single, multi, tags, async, grouped, all in one.
 
 ```ts
-import { VSelect } from 'vue3-select'
+import { VSelect } from '@anilkumarthakur/vue3-select'
 ```
 
 ## Props
@@ -47,7 +47,7 @@ import { VSelect } from 'vue3-select'
 |---|---|---|
 | `update:modelValue` | `unknown` | The selection changes |
 | `update:search` | `string` | The (debounced) query changes |
-| `search` | `string` | Same as above — fire for "@search" listeners |
+| `search` | `string` | Same as above — fire for `@search` listeners |
 | `select` | `NormalizedOption<T>` | An option is added to the selection |
 | `deselect` | `NormalizedOption<T>` | An option is removed |
 | `create` | `string` | Tags mode — user pressed Enter on a non-matching query |
@@ -55,6 +55,10 @@ import { VSelect } from 'vue3-select'
 | `close` | — | Menu closes |
 | `focus` | `FocusEvent` | Focus enters the control |
 | `blur` | `FocusEvent` | Focus leaves the control entirely |
+
+```ts
+import type { VSelectEmits } from '@anilkumarthakur/vue3-select'
+```
 
 ## Slots
 
@@ -77,7 +81,7 @@ See the [Slots guide](../guide/slots) for usage. Quick reference:
 ## Exposed instance methods
 
 ```ts
-import type { VSelectInstance } from 'vue3-select'
+import type { VSelectInstance } from '@anilkumarthakur/vue3-select'
 
 const sel = ref<VSelectInstance>()
 sel.value?.open()         // open the menu
@@ -88,4 +92,28 @@ sel.value?.blur()         // blur whichever element has focus
 sel.value?.clear()        // wipe the selection
 sel.value?.flushSearch()  // commit the pending debounced search now
 sel.value?.isOpen         // boolean — readable mirror of the open state
+```
+
+## Subcomponents
+
+`VSelect` is assembled from two subcomponents that are also exported, in case
+you want to reuse them outside the parent control:
+
+| Component | Use for |
+|---|---|
+| `VSelectOption` | A single menu row — handles `pick` / `highlight` events and renders the active / selected styling |
+| `VSelectTag` | One tag chip with a remove button, used in multi / tags mode |
+
+```ts
+import { VSelectOption, VSelectTag } from '@anilkumarthakur/vue3-select'
+```
+
+## Bundled icons
+
+Three small inline SVGs ship with the package for the default trigger /
+option chrome. Re-export them if you want to mirror the visual style in
+custom slot content.
+
+```ts
+import { ChevronDownIcon, CheckIcon, CloseIcon } from '@anilkumarthakur/vue3-select'
 ```
