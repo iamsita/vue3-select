@@ -1,9 +1,10 @@
 // Public package entry. Consumers import named exports for tree-shaking; the
 // optional `VueSelectPlugin` is available for global registration.
 
-// Side-effect: ship the default theme styles. The components used to import
-// these via `<style lang="scss">` blocks; after the SFC → TSX conversion the
-// import lives here so consumers still get the styles by default.
+// Source SCSS for the dev playground / docs site. Vite's lib build extracts
+// this to `dist/vue3-select.css` (no JS-side import in the bundled output) —
+// consumers must `import '@anilkumarthakur/vue3-select/style.css'` themselves,
+// or `import '@anilkumarthakur/vue3-select/scss'` to compose with their tokens.
 import '@/styles/index.scss'
 
 // Components

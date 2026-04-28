@@ -28,7 +28,6 @@ export default defineConfig({
       exclude: ['playground/**/*', 'tests/**/*'],
       outDir: 'dist',
       entryRoot: 'src',
-      insertTypesEntry: true,
       tsconfigPath: './tsconfig.lib.json',
     }),
   ],
@@ -59,6 +58,10 @@ export default defineConfig({
     // Sourcemaps help downstream consumers debug into the published code.
     sourcemap: true,
     cssCodeSplit: false,
+
+    // Always start from a clean slate so renamed/removed files never linger
+    // in dist between builds (relied on by `npm pack` and the publish flow).
+    emptyOutDir: true,
 
     rollupOptions: {
       // Externalise the Vue peer, the floating-ui dep, and the Nuxt-only
