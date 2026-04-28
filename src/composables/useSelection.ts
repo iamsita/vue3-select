@@ -1,4 +1,4 @@
-import { computed, ref, watch, type Ref } from 'vue'
+import { computed, type ComputedRef, type Ref } from 'vue'
 import type { NormalizedOption, SelectMode } from '@/types/option'
 
 export interface UseSelectionOptions<T> {
@@ -11,14 +11,27 @@ export interface UseSelectionOptions<T> {
   emitDeselect: (option: NormalizedOption<T>) => void
 }
 
+export interface UseSelectionReturn<T> {
+  isMulti: ComputedRef<boolean>
+  selectedValues: ComputedRef<unknown[]>
+  selectedOptions: ComputedRef<NormalizedOption<T>[]>
+  isSelected: (option: NormalizedOption<T>) => boolean
+  select: (option: NormalizedOption<T>) => void
+  deselect: (option: NormalizedOption<T>) => void
+  clear: () => void
+}
+
 /**
- * Core selection state machine. Translates between the v-model shape (one
- * value vs an array) and the internal list of selected normalised options
- * the UI renders. We resolve selections against the option list so that, for
- * object options, the rendered selection survives a referential refresh of
- * the same value (e.g. async option list reloads).
+ * Selection state machine. Owns *only* selection — translating between the
+ * v-model shape (one value vs an array) and the list of selected normalised
+ * options the UI renders. Open/close + activeIndex live in `useMenuState`
+ * so callers building headless variants can compose the two independently.
+ *
+ * We resolve selections against the option list so that, for object options,
+ * the rendered selection survives a referential refresh of the same value
+ * (e.g. async option list reloads).
  */
-export function useSelection<T>(opts: UseSelectionOptions<T>) {
+export function useSelection<T>(opts: UseSelectionOptions<T>): UseSelectionReturn<T> {
   const isMulti = computed(() => opts.mode.value !== 'single')
 
   const selectedValues = computed<unknown[]>(() => {
@@ -105,31 +118,6 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     for (const option of cleared) opts.emitDeselect(option)
   }
 
-  const isOpen = ref(false)
-  const activeIndex = ref(-1)
-
-  function open() {
-    if (isOpen.value) return
-    isOpen.value = true
-  }
-  function close() {
-    if (!isOpen.value) return
-    isOpen.value = false
-    activeIndex.value = -1
-  }
-  function toggle() {
-    if (isOpen.value) close()
-    else open()
-  }
-
-  /** Reset the highlight when the visible list changes underneath us. */
-  watch(
-    () => opts.options.value.length,
-    () => {
-      activeIndex.value = -1
-    },
-  )
-
   return {
     isMulti,
     selectedValues,
@@ -138,10 +126,5 @@ export function useSelection<T>(opts: UseSelectionOptions<T>) {
     select,
     deselect,
     clear,
-    isOpen,
-    activeIndex,
-    open,
-    close,
-    toggle,
   }
 }

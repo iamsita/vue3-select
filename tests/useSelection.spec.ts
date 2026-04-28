@@ -81,15 +81,3 @@ describe('useSelection — multiple mode', () => {
   })
 })
 
-describe('useSelection — open/close', () => {
-  it('toggles the open flag', () => {
-    const { isOpen, open, close, toggle } = setup(null)
-    expect(isOpen.value).toBe(false)
-    open()
-    expect(isOpen.value).toBe(true)
-    close()
-    expect(isOpen.value).toBe(false)
-    toggle()
-    expect(isOpen.value).toBe(true)
-  })
-})

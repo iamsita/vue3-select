@@ -22,11 +22,15 @@ import { normalize } from '@/core/normalize'
 import { useControlFocus } from '@/composables/useControlFocus'
 import { useDebounced } from '@/composables/useDebounced'
 import { useFloatingMenu } from '@/composables/useFloatingMenu'
+import { useFormBinding } from '@/composables/useFormBinding'
 import { useKeyboardNav } from '@/composables/useKeyboardNav'
+import { useMenuState } from '@/composables/useMenuState'
 import { useOptionFilter } from '@/composables/useOptionFilter'
 import { useOutsideClick } from '@/composables/useOutsideClick'
 import { useSelection } from '@/composables/useSelection'
 import { useStableId } from '@/composables/useStableId'
+import { useTaggable } from '@/composables/useTaggable'
+import { useTriggerInteractions } from '@/composables/useTriggerInteractions'
 import { ChevronDownIcon, CloseIcon } from '@/components/icons'
 import VSelectOption from '@/components/VSelectOption'
 import VSelectTag from '@/components/VSelectTag'
@@ -143,27 +147,16 @@ export default defineComponent({
       }),
     )
 
-    const {
-      isMulti,
-      selectedOptions,
-      isSelected,
-      select,
-      deselect,
-      clear,
-      isOpen,
-      activeIndex,
-      open,
-      close,
-      toggle,
-    } = useSelection<T>({
-      modelValue: modelRef,
-      options: normalizedOptions,
-      mode: modeRef,
-      maxSelections: maxSelectionsRef,
-      emitUpdate: (v) => emit('update:modelValue', v),
-      emitSelect: (o) => emit('select', o as NormalizedOption<T>),
-      emitDeselect: (o) => emit('deselect', o as NormalizedOption<T>),
-    })
+    const { isMulti, selectedValues, selectedOptions, isSelected, select, deselect, clear } =
+      useSelection<T>({
+        modelValue: modelRef,
+        options: normalizedOptions,
+        mode: modeRef,
+        maxSelections: maxSelectionsRef,
+        emitUpdate: (v) => emit('update:modelValue', v),
+        emitSelect: (o) => emit('select', o as NormalizedOption<T>),
+        emitDeselect: (o) => emit('deselect', o as NormalizedOption<T>),
+      })
 
     const { filtered } = useOptionFilter<T>({
       options: normalizedOptions,
@@ -172,16 +165,26 @@ export default defineComponent({
       caseSensitive: computed(() => props.caseSensitive),
     })
 
+    const { isOpen, activeIndex, open, close, toggle } = useMenuState({
+      itemsCount: computed(() => filtered.value.length),
+    })
+
     const closeOnSelectResolved = computed(() => props.closeOnSelect ?? props.mode === 'single')
 
     const taggableRef = computed(() => props.taggable || props.mode === 'tags')
 
-    const showCreate = computed(() => {
-      if (!taggableRef.value) return false
-      const q = query.value.trim()
-      if (!q) return false
-      return !filtered.value.some((o) => o.label.toLowerCase() === q.toLowerCase())
+    const { showCreate, createFromQuery: createFromQueryRaw } = useTaggable<T>({
+      enabled: taggableRef,
+      query,
+      filtered,
+      onCreate: (value) => emit('create', value),
     })
+
+    function createFromQuery() {
+      createFromQueryRaw()
+      query.value = ''
+      forceSearch('')
+    }
 
     function selectActive() {
       const idx = activeIndex.value
@@ -191,14 +194,6 @@ export default defineComponent({
       if (closeOnSelectResolved.value) close()
       // Reset the search and skip the debounce — the menu should reflect the
       // selection immediately, not after the next trailing edge.
-      query.value = ''
-      forceSearch('')
-    }
-
-    function createFromQuery() {
-      const q = query.value.trim()
-      if (!q) return
-      emit('create', q)
       query.value = ''
       forceSearch('')
     }
@@ -258,36 +253,15 @@ export default defineComponent({
       })
     })
 
-    function onControlMousedown(event: MouseEvent) {
-      if (props.disabled) return
-      const target = event.target as HTMLElement
-      // Tag-remove buttons handle their own clicks and stop propagation, but
-      // guard anyway in case a custom tag slot forgets to.
-      if (target.closest('.vselect-tag-remove')) return
-      // Clear button is `.vselect-indicator` too, but stops propagation in its
-      // own mousedown handler — so events reaching here from an indicator are
-      // always the chevron, which should toggle the menu.
-
-      // Clicking the search input *should* open the menu (it currently doesn't,
-      // which makes the trigger feel half-broken in single mode where the input
-      // covers most of the control). Let the browser place the caret as normal
-      // — don't preventDefault — but make sure the menu is open. We use
-      // `open()` rather than `toggle()` so clicking inside an already-open
-      // input doesn't close the menu out from under the user.
-      if (target.tagName === 'INPUT') {
-        if (!isOpen.value) open()
-        return
-      }
-
-      event.preventDefault()
-      if (props.searchable && searchEl.value) searchEl.value.focus()
-      toggle()
-    }
-
-    function onSearchInput(event: Event) {
-      query.value = (event.target as HTMLInputElement).value
-      if (!isOpen.value) open()
-    }
+    const { onControlMousedown, onSearchInput } = useTriggerInteractions({
+      disabled: computed(() => props.disabled),
+      searchable: computed(() => props.searchable),
+      isOpen,
+      searchEl,
+      query,
+      open,
+      toggle,
+    })
 
     const { focused, onFocusIn, onFocusOut } = useControlFocus({
       root: rootEl,
@@ -392,14 +366,11 @@ export default defineComponent({
       },
     })
 
-    const hiddenInputValues = computed<string[]>(() => {
-      if (!props.name) return []
-      return selectedOptions.value.map((o) => {
-        const v = o.value
-        if (v == null) return ''
-        if (typeof v === 'object') return JSON.stringify(v)
-        return String(v)
-      })
+    const { hiddenInputs } = useFormBinding({
+      name: computed(() => props.name),
+      required: computed(() => props.required),
+      values: selectedValues,
+      isMulti,
     })
 
     watch(
@@ -611,26 +582,16 @@ export default defineComponent({
           {slots.suffix?.()}
 
           {/* Hidden inputs for native form submission. */}
-          {props.name &&
-            (hiddenInputValues.value.length > 0 ? (
-              hiddenInputValues.value.map((val, i) => (
-                <input
-                  key={i}
-                  class="vselect-hidden-input"
-                  type="hidden"
-                  name={isMulti.value ? `${props.name}[]` : props.name}
-                  value={val}
-                />
-              ))
-            ) : (
-              <input
-                class="vselect-hidden-input"
-                type="hidden"
-                name={props.name}
-                required={props.required}
-                value=""
-              />
-            ))}
+          {hiddenInputs.value.map((input, i) => (
+            <input
+              key={i}
+              class="vselect-hidden-input"
+              type="hidden"
+              name={input.name}
+              value={input.value}
+              required={input.required || undefined}
+            />
+          ))}
         </div>
 
         {isOpen.value &&

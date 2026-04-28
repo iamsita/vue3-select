@@ -17,9 +17,11 @@ import { filterTree, flattenTree, normalizeTree, walkTree } from '@/core/tree'
 import { useControlFocus } from '@/composables/useControlFocus'
 import { useDebounced } from '@/composables/useDebounced'
 import { useFloatingMenu } from '@/composables/useFloatingMenu'
+import { useFormBinding } from '@/composables/useFormBinding'
 import { useOutsideClick } from '@/composables/useOutsideClick'
 import { useStableId } from '@/composables/useStableId'
 import { useTreeSelection } from '@/composables/useTreeSelection'
+import { useTriggerInteractions } from '@/composables/useTriggerInteractions'
 import { ChevronDownIcon, CloseIcon } from '@/components/icons'
 import VTreeSelectNode from '@/components/VTreeSelectNode'
 
@@ -51,14 +53,17 @@ export default defineComponent({
     searchable: { type: Boolean, default: true },
     clearable: { type: Boolean, default: true },
     disabled: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
     maxSelections: { type: Number },
     maxVisibleTags: { type: Number },
     defaultExpandAll: { type: Boolean, default: false },
     showToolbar: { type: Boolean, default: true },
     closeOnSelect: { type: Boolean, default: false },
+    autofocus: { type: Boolean, default: false },
     debounce: { type: Number },
     emptyText: { type: String, default: 'No options' },
     noResultsText: { type: String },
+    loadingText: { type: String, default: 'Loading…' },
     size: { type: String as PropType<SelectSize>, default: 'md' },
     theme: { type: String as PropType<SelectTheme>, default: 'light' },
     ariaLabel: { type: String },
@@ -66,6 +71,8 @@ export default defineComponent({
       type: [String, Object, Boolean] as PropType<string | HTMLElement | false>,
       default: false,
     },
+    name: { type: String },
+    required: { type: Boolean, default: false },
     id: { type: String },
   },
   emits: {
@@ -240,13 +247,6 @@ export default defineComponent({
       emit('collapse', node)
     }
 
-    function onSearchInput(event: Event) {
-      // The watcher on `effectiveQuery` handles the emits — running them here
-      // too would fire on every keystroke and defeat the debounce.
-      query.value = (event.target as HTMLInputElement).value
-      if (!isOpen.value) open()
-    }
-
     function onClearClick(event: MouseEvent) {
       event.preventDefault()
       event.stopPropagation()
@@ -259,21 +259,16 @@ export default defineComponent({
       toggle(node)
     }
 
-    function onControlMousedown(event: MouseEvent) {
-      if (props.disabled) return
-      const target = event.target as HTMLElement
-      if (target.closest('.vselect-tag-remove, .vselect-indicator')) return
-      // Clicking the search input should open the menu — don't preventDefault
-      // so caret placement still works. Use `open()` rather than the toggle so
-      // an already-open menu doesn't snap shut on the user.
-      if (target.tagName === 'INPUT') {
-        if (!isOpen.value) open()
-        return
-      }
-      event.preventDefault()
-      if (props.searchable && searchEl.value) searchEl.value.focus()
-      toggleOpen()
-    }
+    const { onControlMousedown, onSearchInput } = useTriggerInteractions({
+      disabled: computed(() => props.disabled),
+      searchable: computed(() => props.searchable),
+      isOpen,
+      searchEl,
+      query,
+      open,
+      toggle: toggleOpen,
+      ignoreSelectors: ['.vselect-tag-remove', '.vselect-indicator'],
+    })
 
     const teleportToRef = computed(() => props.teleportTo)
     const {
@@ -302,9 +297,26 @@ export default defineComponent({
         'is-disabled': props.disabled,
         'is-multi': true,
         'is-searchable': props.searchable,
+        'is-loading': props.loading,
         'has-value': hasSelection.value,
       },
     ])
+
+    const isMultiRef = computed(() => true)
+    const { hiddenInputs } = useFormBinding({
+      name: computed(() => props.name),
+      required: computed(() => props.required),
+      values: selectedValues,
+      isMulti: isMultiRef,
+    })
+
+    watch(
+      () => props.autofocus,
+      (auto) => {
+        if (auto) nextTick(() => searchEl.value?.focus() ?? controlEl.value?.focus())
+      },
+      { immediate: true },
+    )
 
     expose({
       open,
@@ -344,62 +356,71 @@ export default defineComponent({
         aria-multiselectable={true}
         style={floatingStyles.value}
       >
-        {props.showToolbar &&
-          !isEmpty.value &&
-          (slots.toolbar ? (
-            slots.toolbar({
-              selectAll,
-              clear,
-              selectedCount: selectedValues.value.length,
-            })
-          ) : (
-            <div class="vselect-tree-toolbar">
-              <span>{selectedValues.value.length} selected</span>
-              <span>
-                <button
-                  type="button"
-                  class="vselect-tree-toolbar-action"
-                  tabindex={-1}
-                  onMousedown={withModifiers(() => selectAll(), ['prevent'])}
-                >
-                  Select all
-                </button>
-                {hasSelection.value && (
-                  <button
-                    type="button"
-                    class="vselect-tree-toolbar-action"
-                    tabindex={-1}
-                    onMousedown={withModifiers(() => clear(), ['prevent'])}
-                  >
-                    Clear
-                  </button>
-                )}
-              </span>
-            </div>
-          ))}
-
-        {isEmpty.value ? (
-          slots.empty ? (
-            slots.empty({
-              query: query.value,
-              mode: query.value ? 'no-results' : 'no-options',
-            })
-          ) : (
-            <div class="vselect-tree-empty">{emptyMessage.value}</div>
-          )
+        {props.loading ? (
+          <div class="vselect-loading">
+            <span class="vselect-spinner" />
+            <span>{props.loadingText}</span>
+          </div>
         ) : (
-          filteredTree.value.map((node) => (
-            <VTreeSelectNode
-              key={node.id}
-              node={node}
-              expanded={expanded}
-              getCheckState={getCheckState}
-              idPrefix={baseId.value}
-              onToggle={onToggle}
-              onExpand={onExpand}
-              onCollapse={onCollapse}
-            />
-          ))
+          <>
+            {props.showToolbar &&
+              !isEmpty.value &&
+              (slots.toolbar ? (
+                slots.toolbar({
+                  selectAll,
+                  clear,
+                  selectedCount: selectedValues.value.length,
+                })
+              ) : (
+                <div class="vselect-tree-toolbar">
+                  <span>{selectedValues.value.length} selected</span>
+                  <span>
+                    <button
+                      type="button"
+                      class="vselect-tree-toolbar-action"
+                      tabindex={-1}
+                      onMousedown={withModifiers(() => selectAll(), ['prevent'])}
+                    >
+                      Select all
+                    </button>
+                    {hasSelection.value && (
+                      <button
+                        type="button"
+                        class="vselect-tree-toolbar-action"
+                        tabindex={-1}
+                        onMousedown={withModifiers(() => clear(), ['prevent'])}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </span>
+                </div>
+              ))}
+
+            {isEmpty.value ? (
+              slots.empty ? (
+                slots.empty({
+                  query: query.value,
+                  mode: query.value ? 'no-results' : 'no-options',
+                })
+              ) : (
+                <div class="vselect-tree-empty">{emptyMessage.value}</div>
+              )
+            ) : (
+              filteredTree.value.map((node) => (
+                <VTreeSelectNode
+                  key={node.id}
+                  node={node}
+                  expanded={expanded}
+                  getCheckState={getCheckState}
+                  idPrefix={baseId.value}
+                  onToggle={onToggle}
+                  onExpand={onExpand}
+                  onCollapse={onCollapse}
+                />
+              ))
+            )}
+          </>
         )}
       </div>
     )
@@ -517,6 +538,18 @@ export default defineComponent({
           </div>
 
           {slots.suffix?.()}
+
+          {/* Hidden inputs for native form submission. */}
+          {hiddenInputs.value.map((input, i) => (
+            <input
+              key={i}
+              class="vselect-hidden-input"
+              type="hidden"
+              name={input.name}
+              value={input.value}
+              required={input.required || undefined}
+            />
+          ))}
         </div>
 
         {isOpen.value &&

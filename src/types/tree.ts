@@ -66,6 +66,7 @@ export interface VTreeSelectProps<T extends TreeOptionLike = TreeOptionLike> {
   searchable?: boolean
   clearable?: boolean
   disabled?: boolean
+  loading?: boolean
   /** Hard cap on selected leaves. */
   maxSelections?: number
   /** Collapse the trigger to "+N" once this many tags are visible. */
@@ -77,6 +78,8 @@ export interface VTreeSelectProps<T extends TreeOptionLike = TreeOptionLike> {
   showToolbar?: boolean
   /** Auto-close after every toggle (rarely useful for trees — default false). */
   closeOnSelect?: boolean
+  /** Focus the search input on mount. */
+  autofocus?: boolean
 
   /**
    * Delay (ms) between the last keystroke and the search emits / filter
@@ -87,12 +90,18 @@ export interface VTreeSelectProps<T extends TreeOptionLike = TreeOptionLike> {
 
   emptyText?: string
   noResultsText?: string
+  loadingText?: string
 
   size?: SelectSize
   theme?: SelectTheme
 
   ariaLabel?: string
   teleportTo?: string | HTMLElement | false
+
+  /** Form integration — emits hidden inputs under this name (one per leaf). */
+  name?: string
+  /** Marks the hidden input as required. */
+  required?: boolean
   id?: string
 }
 
