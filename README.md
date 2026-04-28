@@ -1,9 +1,9 @@
-# vue3-select
+# @anilkumarthakur/vue3-select
 
 A typed, accessible, headless-friendly select for Vue 3.
 Single, multi, tags, async, grouped — one component, zero surprises.
 
-[![npm](https://img.shields.io/npm/v/vue3-select.svg)](https://www.npmjs.com/package/vue3-select)
+[![npm](https://img.shields.io/npm/v/@anilkumarthakur/vue3-select.svg)](https://www.npmjs.com/package/@anilkumarthakur/vue3-select)
 [![bundle](https://img.shields.io/badge/bundle-~10.7kb%20gz-blue)](#)
 [![types](https://img.shields.io/badge/types-included-3178c6)](#)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
@@ -25,7 +25,7 @@ Single, multi, tags, async, grouped — one component, zero surprises.
 ## Install
 
 ```bash
-npm i vue3-select
+npm i @anilkumarthakur/vue3-select
 ```
 
 `@floating-ui/vue` is a regular dependency, so npm pulls it in automatically.
@@ -39,7 +39,7 @@ Rollup, esbuild, Bun, etc.).
 import { createApp } from 'vue'
 import App from './App.vue'
 
-import 'vue3-select/style.css'
+import '@anilkumarthakur/vue3-select/style.css'
 
 createApp(App).mount('#app')
 ```
@@ -47,7 +47,7 @@ createApp(App).mount('#app')
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VSelect } from 'vue3-select'
+import { VSelect } from '@anilkumarthakur/vue3-select'
 
 const fruit = ref<string | null>(null)
 const fruits = ['Apple', 'Banana', 'Cherry']
@@ -65,7 +65,7 @@ const fruits = ['Apple', 'Banana', 'Cherry']
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VSelect } from 'vue3-select'
+import { VSelect } from '@anilkumarthakur/vue3-select'
 
 interface Country { code: string; name: string; region: string }
 const countries: Country[] = [/* … */]
@@ -90,7 +90,7 @@ const selected = ref<string[]>([])
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VSelect } from 'vue3-select'
+import { VSelect } from '@anilkumarthakur/vue3-select'
 
 const results = ref([])
 const loading = ref(false)
@@ -147,7 +147,7 @@ parent state is always derived, so you never have to reconcile it manually.
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { VTreeSelect } from 'vue3-select'
+import { VTreeSelect } from '@anilkumarthakur/vue3-select'
 
 interface Cat { id: number; name: string; children: Cat[] }
 const categories: Cat[] = [
@@ -197,16 +197,16 @@ import {
   // Core helpers (pure functions, framework-free)
   normalize,
   normalizeTree,
-} from 'vue3-select'
+} from '@anilkumarthakur/vue3-select'
 ```
 
 ## Nuxt 3 / 4
 
-`vue3-select` ships a first-class Nuxt module. Add it to `nuxt.config.ts`:
+`@anilkumarthakur/vue3-select` ships a first-class Nuxt module. Add it to `nuxt.config.ts`:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ['vue3-select/nuxt'],
+  modules: ['@anilkumarthakur/vue3-select/nuxt'],
 })
 ```
 
@@ -218,7 +218,7 @@ Module options live under `vue3Select`:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ['vue3-select/nuxt'],
+  modules: ['@anilkumarthakur/vue3-select/nuxt'],
   vue3Select: {
     /** Disable to keep tree-shaken named imports only. Default: true */
     components: true,
@@ -226,7 +226,7 @@ export default defineNuxtConfig({
     prefix: '',
     /** Auto-import the headless composables too. Default: false */
     composables: false,
-    /** Inject 'vue3-select/style.css' into Nuxt's CSS array. Default: true */
+    /** Inject '@anilkumarthakur/vue3-select/style.css' into Nuxt's CSS array. Default: true */
     css: true,
   },
 })
@@ -237,8 +237,8 @@ file in `plugins/`:
 
 ```ts
 // plugins/vue3-select.ts
-import { VueSelectPlugin } from 'vue3-select'
-import 'vue3-select/style.css'
+import { VueSelectPlugin } from '@anilkumarthakur/vue3-select'
+import '@anilkumarthakur/vue3-select/style.css'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(VueSelectPlugin)
@@ -355,8 +355,8 @@ Built-in dark mode:
 Accent presets ship as separate SCSS files:
 
 ```scss
-@use 'vue3-select/scss/themes/emerald';
-@use 'vue3-select/scss/themes/rose';
+@use '@anilkumarthakur/vue3-select/scss/themes/emerald';
+@use '@anilkumarthakur/vue3-select/scss/themes/rose';
 ```
 
 ```vue
