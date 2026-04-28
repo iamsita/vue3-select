@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ref } from 'vue'
-import { useMenuState } from '../src/composables/use-menu-state'
+import { useMenuState } from '../src/composables/useMenuState'
 
 describe('useMenuState', () => {
   it('toggles open/close', () => {

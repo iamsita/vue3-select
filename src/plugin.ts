@@ -1,8 +1,8 @@
 import type { App, Plugin } from 'vue'
-import VSelect from '@/components/v-select'
-import VSelectOption from '@/components/v-select-option'
-import VSelectTag from '@/components/v-select-tag'
-import VTreeSelect from '@/components/v-tree-select'
+import VSelect from '@/components/VSelect'
+import VSelectOption from '@/components/VSelectOption'
+import VSelectTag from '@/components/VSelectTag'
+import VTreeSelect from '@/components/VTreeSelect'
 
 export interface VueSelectPluginOptions {
   /** Override the global tag for `<VSelect>` (default: 'VSelect'). */

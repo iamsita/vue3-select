@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope, ref } from 'vue'
-import { useControlFocus } from '@/composables/use-control-focus'
+import { useControlFocus } from '@/composables/useControlFocus'
 
 let root: HTMLDivElement
 let inner: HTMLInputElement
