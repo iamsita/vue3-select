@@ -115,8 +115,37 @@ from reaching `checked`.
 
 ## Toolbar
 
-By default a small toolbar with **Select all** and **Clear** sits above the
-tree. Hide it with `:show-toolbar="false"` if you want a minimalist surface.
+By default a small toolbar sits above the tree with three actions:
+
+- **Expand all** / **Collapse all** — toggles based on the current state, hidden if the tree has no parent nodes
+- **Select all** — pick every selectable leaf (skips disabled leaves and respects `max-selections`)
+- **Clear** — only visible when there's a selection
+
+Hide the whole bar with `:show-toolbar="false"` if you want a minimalist
+surface, or replace its contents with the `toolbar` slot:
+
+```vue
+<VTreeSelect v-model="picked" :options="categories">
+  <template #toolbar="{ selectAll, clear, expandAll, collapseAll, allExpanded, selectedCount }">
+    <div class="my-toolbar">
+      <span>{{ selectedCount }} picked</span>
+      <button @mousedown.prevent="allExpanded ? collapseAll() : expandAll()">
+        {{ allExpanded ? 'Collapse all' : 'Expand all' }}
+      </button>
+      <button @mousedown.prevent="selectAll">Select all</button>
+      <button @mousedown.prevent="clear">Clear</button>
+    </div>
+  </template>
+</VTreeSelect>
+```
+
+Both actions are also exposed on the component instance:
+
+```ts
+const tree = ref<VTreeSelectInstance>()
+tree.value?.expandAll()
+tree.value?.collapseAll()
+```
 
 ## Search
 

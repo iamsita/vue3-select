@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, ref } from 'vue'
-import { useDebounced } from '../src/composables/useDebounced'
+import { useDebounced } from '../src/composables/use-debounced'
 
 beforeEach(() => {
   vi.useFakeTimers()

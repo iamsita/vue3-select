@@ -14,16 +14,16 @@ import type { OptionAccessor, SelectSize, SelectTheme } from '@/types/option'
 import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree-node'
 import type { VTreeSelectSlots } from '@/types'
 import { filterTree, flattenTree, normalizeTree, walkTree } from '@/core/tree'
-import { useControlFocus } from '@/composables/useControlFocus'
-import { useDebounced } from '@/composables/useDebounced'
-import { useFloatingMenu } from '@/composables/useFloatingMenu'
-import { useFormBinding } from '@/composables/useFormBinding'
-import { useOutsideClick } from '@/composables/useOutsideClick'
-import { useStableId } from '@/composables/useStableId'
-import { useTreeSelection } from '@/composables/useTreeSelection'
-import { useTriggerInteractions } from '@/composables/useTriggerInteractions'
+import { useControlFocus } from '@/composables/use-control-focus'
+import { useDebounced } from '@/composables/use-debounced'
+import { useFloatingMenu } from '@/composables/use-floating-menu'
+import { useFormBinding } from '@/composables/use-form-binding'
+import { useOutsideClick } from '@/composables/use-outside-click'
+import { useStableId } from '@/composables/use-stable-id'
+import { useTreeSelection } from '@/composables/use-tree-selection'
+import { useTriggerInteractions } from '@/composables/use-trigger-interactions'
 import { ChevronDownIcon, CloseIcon } from '@/components/icons'
-import VTreeSelectNode from '@/components/VTreeSelectNode'
+import VTreeSelectNode from '@/components/v-tree-select-node'
 
 export default defineComponent({
   name: 'VTreeSelect',
@@ -247,6 +247,44 @@ export default defineComponent({
       emit('collapse', node)
     }
 
+    function expandAll() {
+      walkTree(tree.value, (n) => {
+        if (!n.isLeaf) expanded.add(n.id)
+      })
+    }
+
+    function collapseAll() {
+      expanded.clear()
+    }
+
+    // True when every non-leaf node in the *full* tree (not the filtered
+    // subset) is expanded. Driven from `tree` rather than `filteredTree` so
+    // the toolbar's toggle reflects the canonical state, not a search artefact.
+    const allExpanded = computed(() => {
+      let allOpen = true
+      let hasParents = false
+      walkTree(tree.value, (n) => {
+        if (n.isLeaf) return
+        hasParents = true
+        if (!expanded.has(n.id)) {
+          allOpen = false
+          return false
+        }
+      })
+      return hasParents && allOpen
+    })
+
+    const hasParents = computed(() => {
+      let found = false
+      walkTree(tree.value, (n) => {
+        if (!n.isLeaf) {
+          found = true
+          return false
+        }
+      })
+      return found
+    })
+
     function onClearClick(event: MouseEvent) {
       event.preventDefault()
       event.stopPropagation()
@@ -332,6 +370,8 @@ export default defineComponent({
       collapse: (id: string) => {
         expanded.delete(id)
       },
+      expandAll,
+      collapseAll,
       flushSearch,
       get isOpen() {
         return isOpen.value
@@ -369,12 +409,28 @@ export default defineComponent({
                 slots.toolbar({
                   selectAll,
                   clear,
+                  expandAll,
+                  collapseAll,
+                  allExpanded: allExpanded.value,
                   selectedCount: selectedValues.value.length,
                 })
               ) : (
                 <div class="vselect-tree-toolbar">
                   <span>{selectedValues.value.length} selected</span>
                   <span>
+                    {hasParents.value && (
+                      <button
+                        type="button"
+                        class="vselect-tree-toolbar-action"
+                        tabindex={-1}
+                        onMousedown={withModifiers(
+                          () => (allExpanded.value ? collapseAll() : expandAll()),
+                          ['prevent'],
+                        )}
+                      >
+                        {allExpanded.value ? 'Collapse all' : 'Expand all'}
+                      </button>
+                    )}
                     <button
                       type="button"
                       class="vselect-tree-toolbar-action"
@@ -383,16 +439,15 @@ export default defineComponent({
                     >
                       Select all
                     </button>
-                    {hasSelection.value && (
-                      <button
-                        type="button"
-                        class="vselect-tree-toolbar-action"
-                        tabindex={-1}
-                        onMousedown={withModifiers(() => clear(), ['prevent'])}
-                      >
-                        Clear
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      class="vselect-tree-toolbar-action"
+                      tabindex={-1}
+                      disabled={!hasSelection.value}
+                      onMousedown={withModifiers(() => clear(), ['prevent'])}
+                    >
+                      Clear
+                    </button>
                   </span>
                 </div>
               ))}

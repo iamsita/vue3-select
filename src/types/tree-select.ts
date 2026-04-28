@@ -74,6 +74,10 @@ export interface VTreeSelectInstance {
   selectAll: () => void
   expand: (id: string) => void
   collapse: (id: string) => void
+  /** Expand every parent node in the tree. */
+  expandAll: () => void
+  /** Collapse every parent node in the tree. */
+  collapseAll: () => void
   /** When `debounce` is set, fires the pending search emit immediately. No-op otherwise. */
   flushSearch: () => void
   readonly isOpen: boolean

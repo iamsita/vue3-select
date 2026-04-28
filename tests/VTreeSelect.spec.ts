@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 import { mount, type VueWrapper } from '@vue/test-utils'
-import VTreeSelect from '@/components/VTreeSelect'
+import VTreeSelect from '@/components/v-tree-select'
 
 interface Cat {
   id: number
@@ -143,6 +143,58 @@ describe('<VTreeSelect>', () => {
       .find((b) => b.text() === 'Select all')!
     await selectAll.trigger('mousedown')
     expect(wrapper.emitted('update:modelValue')!.at(-1)).toEqual([[2, 3, 10]])
+  })
+
+  it('toggles every parent via the Expand all / Collapse all toolbar button', async () => {
+    wrapper = mount(VTreeSelect, {
+      props: {
+        options: SAMPLE,
+        optionValue: 'id',
+        optionLabel: 'name',
+      },
+      attachTo: document.body,
+    })
+    await open(wrapper)
+    await nextTick()
+    // Nothing expanded by default — only the two roots are rendered.
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(2)
+
+    const action = () =>
+      wrapper!
+        .findAll('.vselect-tree-toolbar-action')
+        .find((b) => b.text() === 'Expand all' || b.text() === 'Collapse all')!
+
+    expect(action().text()).toBe('Expand all')
+    await action().trigger('mousedown')
+    await nextTick()
+    // Every parent now expanded — leaves render too (2 roots + 3 leaves = 5).
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(5)
+    expect(action().text()).toBe('Collapse all')
+
+    await action().trigger('mousedown')
+    await nextTick()
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(2)
+    expect(action().text()).toBe('Expand all')
+  })
+
+  it('exposes expandAll / collapseAll on the instance', async () => {
+    wrapper = mount(VTreeSelect, {
+      props: {
+        options: SAMPLE,
+        optionValue: 'id',
+        optionLabel: 'name',
+      },
+      attachTo: document.body,
+    })
+    await open(wrapper)
+    await nextTick()
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(2)
+    ;(wrapper.vm as unknown as { expandAll: () => void }).expandAll()
+    await nextTick()
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(5)
+    ;(wrapper.vm as unknown as { collapseAll: () => void }).collapseAll()
+    await nextTick()
+    expect(wrapper.findAll('[role="treeitem"]')).toHaveLength(2)
   })
 
   it('hides the toolbar when show-toolbar is false', async () => {

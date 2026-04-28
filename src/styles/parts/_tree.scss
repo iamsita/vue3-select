@@ -29,9 +29,17 @@
     color: var(--vselect-accent);
     cursor: pointer;
     font: inherit;
+    transition:
+      color var(--vselect-transition),
+      background-color var(--vselect-transition);
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: var(--vselect-accent-soft);
+    }
+
+    &:disabled {
+      color: var(--vselect-text-disabled);
+      cursor: not-allowed;
     }
   }
 

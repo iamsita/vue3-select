@@ -7,11 +7,11 @@
 import '@/styles/index.scss'
 
 // Components
-export { default as VSelect } from '@/components/VSelect'
-export { default as VSelectOption } from '@/components/VSelectOption'
-export { default as VSelectTag } from '@/components/VSelectTag'
-export { default as VTreeSelect } from '@/components/VTreeSelect'
-export { default as VTreeSelectNode } from '@/components/VTreeSelectNode'
+export { default as VSelect } from '@/components/v-select'
+export { default as VSelectOption } from '@/components/v-select-option'
+export { default as VSelectTag } from '@/components/v-select-tag'
+export { default as VTreeSelect } from '@/components/v-tree-select'
+export { default as VTreeSelectNode } from '@/components/v-tree-select-node'
 export * from '@/components/icons'
 
 // Plugin

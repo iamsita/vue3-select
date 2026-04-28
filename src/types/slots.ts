@@ -77,6 +77,12 @@ export interface TreeValueSlotProps<T = unknown> {
 export interface TreeToolbarSlotProps {
   selectAll: () => void
   clear: () => void
+  /** Expand every parent node in the tree. */
+  expandAll: () => void
+  /** Collapse every parent node in the tree. */
+  collapseAll: () => void
+  /** True when every parent in the full tree is currently expanded. */
+  allExpanded: boolean
   selectedCount: number
 }
 

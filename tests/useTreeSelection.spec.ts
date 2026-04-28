@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { computed, ref } from 'vue'
-import { useTreeSelection } from '../src/composables/useTreeSelection'
+import { useTreeSelection } from '../src/composables/use-tree-selection'
 import { normalizeTree, walkTree } from '../src/core/tree'
 import type { NormalizedTreeNode } from '../src/types/tree'
 

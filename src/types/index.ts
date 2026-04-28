@@ -1,6 +1,6 @@
 export * from '@/types/option'
 export * from '@/types/filter'
-export * from '@/types/select'
+export * from '@/types/v-select'
 export * from '@/types/emits'
 export * from '@/types/slots'
 export * from '@/types/tree-node'

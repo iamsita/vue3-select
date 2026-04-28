@@ -70,7 +70,7 @@ import type { VTreeSelectEmits } from '@anilkumarthakur/vue3-select'
 | `suffix` | — |
 | `value` | `{ selected: NormalizedTreeNode<T>[] }` |
 | `tag` | `{ node, remove, disabled }` |
-| `toolbar` | `{ selectAll, clear, selectedCount }` |
+| `toolbar` | `{ selectAll, clear, expandAll, collapseAll, allExpanded, selectedCount }` |
 | `empty` | `{ query, mode: 'no-options' \| 'no-results' }` |
 | `dropdownicon` | `{ open }` |
 | `clearicon` | `{ clear }` |
@@ -90,6 +90,8 @@ tree.value?.clear()
 tree.value?.selectAll()
 tree.value?.expand(nodeId)
 tree.value?.collapse(nodeId)
+tree.value?.expandAll()
+tree.value?.collapseAll()
 tree.value?.flushSearch()
 tree.value?.isOpen
 ```

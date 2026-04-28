@@ -1,3 +1,3 @@
-export { ChevronDownIcon } from '@/components/icons/ChevronDownIcon'
-export { CloseIcon } from '@/components/icons/CloseIcon'
-export { CheckIcon } from '@/components/icons/CheckIcon'
+export { ChevronDownIcon } from '@/components/icons/chevron-down-icon'
+export { CloseIcon } from '@/components/icons/close-icon'
+export { CheckIcon } from '@/components/icons/check-icon'
