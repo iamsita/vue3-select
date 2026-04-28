@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { computed, ref } from 'vue'
-import { useSelection } from '../src/composables/useSelection'
-import { normalize } from '../src/core/normalize'
+import { useSelection } from '@/composables/useSelection'
+import { normalize } from '@/core/normalize'
 
 function setup(initial: unknown, mode: 'single' | 'multiple' | 'tags' = 'single') {
   const modelValue = ref<unknown>(initial)

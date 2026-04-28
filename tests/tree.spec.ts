@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { filterTree, flattenTree, getLeafValues, normalizeTree, walkTree } from '../src/core/tree'
+import { filterTree, flattenTree, getLeafValues, normalizeTree, walkTree } from '@/core/tree'
 
 interface Cat {
   id: number
