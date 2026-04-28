@@ -80,4 +80,3 @@ describe('useSelection — multiple mode', () => {
     expect(emitUpdate).not.toHaveBeenCalled()
   })
 })
-

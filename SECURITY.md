@@ -14,11 +14,11 @@ Older versions are not maintained — please upgrade.
 
 **Do not** open a public GitHub issue for security reports.
 
-Please use [GitHub's private vulnerability reporting](https://github.com/matat/vue3-select/security/advisories/new)
+Please use [GitHub's private vulnerability reporting](https://github.com/anilkumarthakur60/vue3-select/security/advisories/new)
 instead. We aim to acknowledge reports within 72 hours and to ship a fix or
 mitigation within 14 days for high-severity issues.
 
-If you'd prefer email, write to `security@matat.io` and include:
+If you'd prefer email, write to `anilkumarthakur60@gmail.com` and include:
 
 - A description of the vulnerability and its impact
 - Reproduction steps or a minimal proof-of-concept

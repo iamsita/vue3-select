@@ -6,7 +6,7 @@ to a working PR as quickly as possible.
 ## Development setup
 
 ```bash
-git clone https://github.com/matat/vue3-select.git
+git clone https://github.com/anilkumarthakur60/vue3-select.git
 cd vue3-select
 npm install
 ```
@@ -168,5 +168,5 @@ provenance.
 
 ## Questions?
 
-Open an [issue](https://github.com/matat/vue3-select/issues) — happy to
+Open an [issue](https://github.com/anilkumarthakur60/vue3-select/issues) — happy to
 discuss before you write code.

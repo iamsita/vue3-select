@@ -1,5 +1,4 @@
 import { addComponent, addImportsSources, defineNuxtModule } from '@nuxt/kit'
-import type { Nuxt } from '@nuxt/schema'
 
 export interface ModuleOptions {
   /**
@@ -29,6 +28,11 @@ export interface ModuleOptions {
   css?: boolean
 }
 
+// Resolved against the consumer's node_modules — must match the published
+// package name in package.json so Nuxt's bundler can find the entry.
+const PKG = '@anilkumarthakur/vue3-select'
+const PKG_STYLE = `${PKG}/style.css`
+
 const COMPONENT_NAMES = [
   'VSelect',
   'VSelectOption',
@@ -47,25 +51,25 @@ const COMPOSABLE_NAMES = [
 ] as const
 
 /**
- * Nuxt 3 module — opt-in via `nuxt.config.ts`:
+ * Nuxt 3 / 4 module — opt-in via `nuxt.config.ts`:
  *
  *     export default defineNuxtConfig({
- *       modules: ['vue3-select/nuxt'],
+ *       modules: ['@anilkumarthakur/vue3-select/nuxt'],
  *     })
  *
  * Or with options under the `vue3Select` key:
  *
  *     export default defineNuxtConfig({
- *       modules: ['vue3-select/nuxt'],
+ *       modules: ['@anilkumarthakur/vue3-select/nuxt'],
  *       vue3Select: { prefix: 'My', composables: true },
  *     })
  */
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: 'vue3-select',
+    name: '@anilkumarthakur/vue3-select',
     configKey: 'vue3Select',
     compatibility: {
-      nuxt: '>=3.0.0',
+      nuxt: '^3.0.0 || ^4.0.0',
     },
   },
   defaults: {
@@ -74,11 +78,11 @@ export default defineNuxtModule<ModuleOptions>({
     composables: false,
     css: true,
   },
-  setup(options: ModuleOptions, nuxt: Nuxt) {
+  setup(options, nuxt) {
     if (options.css) {
       nuxt.options.css ||= []
-      if (!nuxt.options.css.includes('vue3-select/style.css')) {
-        nuxt.options.css.push('vue3-select/style.css')
+      if (!nuxt.options.css.includes(PKG_STYLE)) {
+        nuxt.options.css.push(PKG_STYLE)
       }
     }
 
@@ -88,14 +92,14 @@ export default defineNuxtModule<ModuleOptions>({
         addComponent({
           name: prefix ? `${prefix}${name.slice(1)}` : name,
           export: name,
-          filePath: 'vue3-select',
+          filePath: PKG,
         })
       }
     }
 
     if (options.composables) {
       addImportsSources({
-        from: 'vue3-select',
+        from: PKG,
         imports: [...COMPOSABLE_NAMES],
       })
     }

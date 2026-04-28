@@ -13,7 +13,7 @@ version 2.1.
 ## Reporting
 
 If you witness or experience behaviour that breaches this code, email
-`conduct@matat.io`. Reports are confidential. Maintainers will respond
+`anilkumarthakur60@gmail.com`. Reports are confidential. Maintainers will respond
 within 72 hours and may take any action they consider proportionate,
 including temporary or permanent bans.
 
