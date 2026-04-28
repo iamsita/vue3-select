@@ -37,7 +37,8 @@
     },
     "./style.css": "./dist/vue3-select.css",
     "./scss": "./src/styles/index.scss",
-    "./scss/*": "./src/styles/*"
+    "./scss/*": "./src/styles/*",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",

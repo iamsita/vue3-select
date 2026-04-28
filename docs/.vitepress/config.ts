@@ -35,7 +35,7 @@ export default defineConfig({
       {
         text: 'v0.1.0',
         items: [
-          { text: 'Changelog', link: 'https://github.com/anilkumarthakur60/vue3-select/blob/master/CHANGELOG.md' },
+          { text: 'Changelog', link: 'https://github.com/anilkumarthakur60/vue3-select/blob/main/CHANGELOG.md' },
           { text: 'npm', link: 'https://www.npmjs.com/package/@anilkumarthakur/vue3-select' },
         ],
       },
@@ -104,7 +104,7 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/anilkumarthakur60/vue3-select/edit/master/docs/:path',
+      pattern: 'https://github.com/anilkumarthakur60/vue3-select/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 
