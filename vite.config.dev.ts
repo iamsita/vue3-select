@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 // Dev server / playground build. Drives `npm run dev` and `npm run build:demo`.
@@ -15,7 +16,7 @@ export default defineConfig({
   // by setting `BASE_URL=/vue3-select/` at build time.
   base: process.env.BASE_URL ?? '/',
 
-  plugins: [vue(), vueDevTools()],
+  plugins: [vue(), vueJsx(), vueDevTools()],
 
   resolve: {
     // Array form is required here because we have two overlapping aliases:

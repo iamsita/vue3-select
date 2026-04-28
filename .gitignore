@@ -39,5 +39,7 @@ __screenshots__/
 *.timestamp-*-*.mjs
 
 # VitePress
+.vitepress/cache
+.vitepress/dist
 docs/.vitepress/cache
 docs/.vitepress/dist

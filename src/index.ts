@@ -1,12 +1,17 @@
 // Public package entry. Consumers import named exports for tree-shaking; the
 // optional `VueSelectPlugin` is available for global registration.
 
+// Side-effect: ship the default theme styles. The components used to import
+// these via `<style lang="scss">` blocks; after the SFC → TSX conversion the
+// import lives here so consumers still get the styles by default.
+import '@/styles/index.scss'
+
 // Components
-export { default as VSelect } from '@/components/VSelect.vue'
-export { default as VSelectOption } from '@/components/VSelectOption.vue'
-export { default as VSelectTag } from '@/components/VSelectTag.vue'
-export { default as VTreeSelect } from '@/components/VTreeSelect.vue'
-export { default as VTreeSelectNode } from '@/components/VTreeSelectNode.vue'
+export { default as VSelect } from '@/components/VSelect'
+export { default as VSelectOption } from '@/components/VSelectOption'
+export { default as VSelectTag } from '@/components/VSelectTag'
+export { default as VTreeSelect } from '@/components/VTreeSelect'
+export { default as VTreeSelectNode } from '@/components/VTreeSelectNode'
 export * from '@/components/icons'
 
 // Plugin

@@ -13,10 +13,7 @@ export {
   type UseFloatingMenuOptions,
   type UseFloatingMenuReturn,
 } from '@/composables/useFloatingMenu'
-export {
-  useOutsideClick,
-  type UseOutsideClickOptions,
-} from '@/composables/useOutsideClick'
+export { useOutsideClick, type UseOutsideClickOptions } from '@/composables/useOutsideClick'
 export {
   useControlFocus,
   type UseControlFocusOptions,

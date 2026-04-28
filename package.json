@@ -86,7 +86,7 @@
     "lint:eslint": "eslint . --fix --cache",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "format": "prettier --write --experimental-cli \"src/**/*.{ts,vue,scss}\" \"playground/**/*.{ts,vue}\" \"tests/**/*.ts\"",
+    "format": "prettier --write --experimental-cli \"src/**/*.{ts,tsx,scss}\" \"playground/**/*.{ts,vue}\" \"tests/**/*.ts\"",
     "commitlint": "commitlint --edit",
     "prepublishOnly": "run-s test build",
     "prepare": "husky"
@@ -123,6 +123,7 @@
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.12.2",
     "@vitejs/plugin-vue": "^6.0.6",
+    "@vitejs/plugin-vue-jsx": "^5.1.5",
     "@vitest/coverage-v8": "^4.1.5",
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "^2.4.8",

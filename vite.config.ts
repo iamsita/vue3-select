@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import dts from 'vite-plugin-dts'
 
 // Library-build config — produces what consumers install via npm:
@@ -21,8 +22,9 @@ const here = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 export default defineConfig({
   plugins: [
     vue(),
+    vueJsx(),
     dts({
-      include: ['src/**/*.ts', 'src/**/*.vue'],
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
       exclude: ['playground/**/*', 'tests/**/*'],
       outDir: 'dist',
       entryRoot: 'src',
