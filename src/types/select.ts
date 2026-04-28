@@ -3,7 +3,7 @@ import type { OptionLike, SelectMode, SelectSize, SelectTheme } from '@/types/op
 
 /**
  * Public props surface for `<VSelect>`. Defined here (rather than inline in
- * the SFC) so `vue-tsc` can roll it into the generated `.d.ts` without
+ * the component) so `vue-tsc` can roll it into the generated `.d.ts` without
  * tripping on synthesized private names.
  */
 export interface VSelectProps<T extends OptionLike = OptionLike> {
@@ -68,4 +68,17 @@ export interface VSelectProps<T extends OptionLike = OptionLike> {
   required?: boolean
   /** Override automatic id generation. */
   id?: string
+}
+
+/** Methods exposed via `defineExpose` on `<VSelect>`. */
+export interface VSelectInstance {
+  open: () => void
+  close: () => void
+  toggle: () => void
+  focus: () => void
+  blur: () => void
+  clear: () => void
+  /** When `debounce` is set, fires the pending search emit immediately. No-op otherwise. */
+  flushSearch: () => void
+  readonly isOpen: boolean
 }

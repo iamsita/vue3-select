@@ -1,5 +1,5 @@
 import type { NormalizedOption } from '@/types/option'
-import type { NormalizedTreeNode } from '@/types/tree'
+import type { NormalizedTreeNode } from '@/types/tree-node'
 
 /**
  * Public emits surface for `<VSelect>`. Mirrors the runtime `emits` block —
@@ -16,19 +16,6 @@ export interface VSelectEmits<T = unknown> {
   (e: 'deselect', option: NormalizedOption<T>): void
   (e: 'create', value: string): void
   (e: 'search', query: string): void
-}
-
-/** Methods exposed via `defineExpose` on `<VSelect>`. */
-export interface VSelectInstance {
-  open: () => void
-  close: () => void
-  toggle: () => void
-  focus: () => void
-  blur: () => void
-  clear: () => void
-  /** When `debounce` is set, fires the pending search emit immediately. No-op otherwise. */
-  flushSearch: () => void
-  readonly isOpen: boolean
 }
 
 /**

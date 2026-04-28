@@ -1,5 +1,5 @@
 import { computed, defineComponent, ref, watch, type PropType } from 'vue'
-import type { NormalizedTreeNode, TreeNodeCheckState, TreeOptionLike } from '@/types/tree'
+import type { NormalizedTreeNode, TreeNodeCheckState, TreeOptionLike } from '@/types/tree-node'
 import { ChevronDownIcon } from '@/components/icons'
 
 const VTreeSelectNode = defineComponent({

@@ -11,7 +11,7 @@ import {
   type SlotsType,
 } from 'vue'
 import type { OptionAccessor, SelectSize, SelectTheme } from '@/types/option'
-import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree'
+import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree-node'
 import type { VTreeSelectSlots } from '@/types'
 import { filterTree, flattenTree, normalizeTree, walkTree } from '@/core/tree'
 import { useControlFocus } from '@/composables/useControlFocus'

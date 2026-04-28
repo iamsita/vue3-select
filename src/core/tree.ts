@@ -1,5 +1,5 @@
 import type { OptionAccessor } from '@/types/option'
-import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree'
+import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree-node'
 import { readAccessor } from '@/core/accessor'
 
 interface NormalizeTreeConfig<T> {

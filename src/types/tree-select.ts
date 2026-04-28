@@ -1,52 +1,10 @@
-import type { OptionAccessor, SelectSize, SelectTheme } from './option'
-
-/**
- * Shape every tree input is normalised into. Mirrors `NormalizedOption` for
- * flat lists, with depth + parent + children added so the renderer can draw
- * the hierarchy without recomputing on every paint.
- */
-export interface NormalizedTreeNode<T = unknown> {
-  /** Stable key — used by Vue's v-for and aria. */
-  id: string
-  /** The value emitted via v-model when this node is a leaf. */
-  value: unknown
-  /** Display label. */
-  label: string
-  /** 0 for top-level, increments per level of nesting. */
-  depth: number
-  /** Reference to the parent's `id`, or null at the top level. */
-  parentId: string | null
-  /** A leaf has no children; only leaves are toggled into v-model. */
-  isLeaf: boolean
-  /** Disabled nodes render but cannot be toggled. */
-  disabled: boolean
-  /** Recursively normalised children. */
-  children: NormalizedTreeNode<T>[]
-  /** Original input as supplied by the caller. */
-  raw: T
-}
-
-/**
- * The widest type a tree input can be. Plain `object` so consumer interfaces
- * (which lack an index signature and therefore can't satisfy
- * `Record<string, unknown>`) are still assignable, without resorting to `any`.
- * The accessors cast through `Readonly<Record<string, unknown>>` internally
- * whenever they need to read a property by name.
- */
-export type TreeOptionLike = object
-
-/**
- * Accessor for the children array on a tree input. Default: `'children'`.
- */
-export type TreeChildrenAccessor<T> = OptionAccessor<T, T[] | undefined>
-
-/** Tri-state used to drive the parent checkbox visual. */
-export type TreeNodeCheckState = 'unchecked' | 'indeterminate' | 'checked'
+import type { SelectSize, SelectTheme } from '@/types/option'
+import type { TreeOptionLike } from '@/types/tree-node'
 
 /**
  * Public props surface for `<VTreeSelect>`. Extracted here (rather than
- * inline in the SFC) so `vue-tsc` can roll it into the generated `.d.ts`
- * without tripping on synthesized private names.
+ * inline in the component) so `vue-tsc` can roll it into the generated
+ * `.d.ts` without tripping on synthesized private names.
  */
 export interface VTreeSelectProps<T extends TreeOptionLike = TreeOptionLike> {
   /** v-model — array of leaf values currently selected. */
@@ -118,5 +76,5 @@ export interface VTreeSelectInstance {
   collapse: (id: string) => void
   /** When `debounce` is set, fires the pending search emit immediately. No-op otherwise. */
   flushSearch: () => void
-  isOpen: boolean
+  readonly isOpen: boolean
 }

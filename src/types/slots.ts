@@ -1,5 +1,5 @@
 import type { NormalizedOption } from '@/types/option'
-import type { NormalizedTreeNode } from '@/types/tree'
+import type { NormalizedTreeNode } from '@/types/tree-node'
 
 export interface OptionSlotProps<T = unknown> {
   option: NormalizedOption<T>

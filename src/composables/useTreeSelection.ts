@@ -1,5 +1,5 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
-import type { NormalizedTreeNode, TreeNodeCheckState } from '@/types/tree'
+import type { NormalizedTreeNode, TreeNodeCheckState } from '@/types/tree-node'
 import { flattenTree, getLeafValues, walkTree } from '@/core/tree'
 
 export interface UseTreeSelectionOptions<T> {
