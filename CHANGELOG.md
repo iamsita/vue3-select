@@ -27,9 +27,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `auto` themes. Stylesheet wrapped in `@layer vselect` so consumer
   overrides win without specificity wars.
 - Accent presets: emerald, rose (SCSS subpath imports).
-- Headless composables: `useSelection`, `useOptionFilter`, `useKeyboardNav`,
-  `useStableId`.
+- `<VTreeSelect>` for hierarchical pickers — tri-state parents derived from
+  leaf v-model, search auto-expansion, optional "select all" toolbar, and a
+  matching `useTreeSelection` headless composable.
+- `useDebounced` composable powering the debounced `search` / filter pipeline
+  in both `<VSelect>` and `<VTreeSelect>`, with `flush()`, `cancel()`, and
+  `force(value)` escape hatches for async pickers.
+- Headless composables: `useSelection`, `useTreeSelection`, `useOptionFilter`,
+  `useKeyboardNav`, `useStableId`, `useDebounced`, `useFloatingMenu`,
+  `useOutsideClick`, `useControlFocus` — the same primitives the SFCs use,
+  exposed for consumers building custom variants.
 - Core helpers: `normalize`, `defaultFilter`, `toggleValue`, `valuesEqual`,
-  `escapeRegex`, `readAccessor`, `isPrimitive`.
+  `escapeRegex`, `readAccessor`, `isPrimitive`, `normalizeTree`, `walkTree`,
+  `flattenTree`, `filterTree`, `getLeafValues`, `getAncestorIds`.
 - Three sizes: `sm` / `md` / `lg`.
-- Optional Vue plugin (`VueSelectPlugin`) for global registration.
+- Optional Vue plugin (`VueSelectPlugin`) for global registration of both
+  `<VSelect>` and `<VTreeSelect>`.
+- First-class Nuxt 3 / 4 module at `vue3-select/nuxt` — auto-registers the
+  components, optionally auto-imports the composables, and injects the
+  prebuilt stylesheet. `@nuxt/kit` and `nuxt` are declared as **optional**
+  peer dependencies so non-Nuxt users incur no install cost.

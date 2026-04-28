@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import { computed, ref } from 'vue'
-import { useTreeSelection } from '../src/composables/useTreeSelection'
-import { normalizeTree, walkTree } from '../src/core/tree'
-import type { NormalizedTreeNode } from '../src/types/tree'
+import { useTreeSelection } from '@/composables/useTreeSelection'
+import { normalizeTree, walkTree } from '@/core/tree'
+import type { NormalizedTreeNode } from '@/types/tree-node'
 
 interface Cat {
   id: number
@@ -85,7 +85,7 @@ describe('useTreeSelection — leaves', () => {
 describe('useTreeSelection — parents', () => {
   it('selects every leaf below an unchecked parent', () => {
     const { toggle, findById, emitUpdate } = setup([])
-    toggle(findById(2))
+    toggle(findById(2)) // Frontend → CSS, JS
     expect(emitUpdate).toHaveBeenLastCalledWith([3, 4])
   })
 
@@ -97,7 +97,7 @@ describe('useTreeSelection — parents', () => {
 
   it('promotes an indeterminate parent to fully checked', () => {
     const { toggle, findById, emitUpdate } = setup([3])
-    toggle(findById(2))
+    toggle(findById(2)) // partial → full
     expect(emitUpdate).toHaveBeenLastCalledWith([3, 4])
   })
 
@@ -136,7 +136,7 @@ describe('useTreeSelection — caps and clear', () => {
     walkTree(tree.value, (n) => {
       if (n.value === 7) target = n
     })
-    toggle(target!)
+    toggle(target!) // would push to 3 — over the cap
     expect(emitUpdate).not.toHaveBeenCalled()
   })
 

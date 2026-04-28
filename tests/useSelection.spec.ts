@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { computed, ref } from 'vue'
-import { useSelection } from '../src/composables/useSelection'
-import { normalize } from '../src/core/normalize'
+import { useSelection } from '@/composables/useSelection'
+import { normalize } from '@/core/normalize'
 
 function setup(initial: unknown, mode: 'single' | 'multiple' | 'tags' = 'single') {
   const modelValue = ref<unknown>(initial)
@@ -78,18 +78,5 @@ describe('useSelection — multiple mode', () => {
     })
     select(options.value[2]!)
     expect(emitUpdate).not.toHaveBeenCalled()
-  })
-})
-
-describe('useSelection — open/close', () => {
-  it('toggles the open flag', () => {
-    const { isOpen, open, close, toggle } = setup(null)
-    expect(isOpen.value).toBe(false)
-    open()
-    expect(isOpen.value).toBe(true)
-    close()
-    expect(isOpen.value).toBe(false)
-    toggle()
-    expect(isOpen.value).toBe(true)
   })
 })

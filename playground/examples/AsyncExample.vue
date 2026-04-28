@@ -10,6 +10,8 @@ const userLoading = ref(false)
 const userResults = ref<User[]>([])
 const selectedUser = ref<number | null>(null)
 
+// `:debounce="350"` does the trailing-edge wait — the handler only fires
+// once the user stops typing, no manual setTimeout dance required.
 async function onUserSearch(q: string) {
   userQuery.value = q
   if (!q) {
@@ -18,6 +20,7 @@ async function onUserSearch(q: string) {
     return
   }
   userLoading.value = true
+  // Simulate a network call.
   await new Promise((r) => setTimeout(r, 200))
   const surnames = ['Smith', 'Jones', 'Patel', 'Wong', 'Garcia']
   userResults.value = Array.from({ length: 5 }, (_, i) => ({

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { defaultFilter, escapeRegex } from '../src/core/filter'
-import type { NormalizedOption } from '../src/types/option'
+import { defaultFilter, escapeRegex } from '@/core/filter'
+import type { NormalizedOption } from '@/types/option'
 
 function opt(label: string): NormalizedOption {
   return { id: label, value: label, label, raw: label }

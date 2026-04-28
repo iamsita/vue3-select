@@ -11,6 +11,7 @@ interface Category {
   children: Category[]
 }
 
+// Three-level tree — the exact shape the user is feeding the component.
 const categories: Category[] = [
   {
     id: 1,
@@ -111,6 +112,7 @@ const categories: Category[] = [
   },
 ]
 
+// Same data, but flat (the user's first example) — every node has children: [].
 const flatCategories: Category[] = [
   { id: 3, name: 'HTML, CSS & UI Frameworks', slug: 'html-css-ui-frameworks', children: [] },
   {

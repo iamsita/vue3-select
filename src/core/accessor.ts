@@ -1,5 +1,10 @@
 import type { OptionAccessor } from '@/types/option'
 
+/**
+ * Reads a property or computes a derived value. Accepts a string key OR a
+ * function so callers can stay terse for object options without losing
+ * access to deep paths or computed labels.
+ */
 export function readAccessor<T, R>(
   option: T,
   accessor: OptionAccessor<T, R> | undefined,

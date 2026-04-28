@@ -1,5 +1,10 @@
 import type { NormalizedOption } from '@/types/option'
 
+/**
+ * Default substring matcher. We intentionally don't ship a fuzzy ranker by
+ * default — most consumers want "label contains query", and shipping a 4kb
+ * fuzzy library would surprise people. Pass a custom `filter` prop for fuzzy.
+ */
 export function defaultFilter<T>(
   query: string,
   option: NormalizedOption<T>,
@@ -11,6 +16,7 @@ export function defaultFilter<T>(
   return haystack.includes(needle)
 }
 
+/** Escape a string so it can be embedded as a literal inside a regex. */
 export function escapeRegex(input: string): string {
   return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

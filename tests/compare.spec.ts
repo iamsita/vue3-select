@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { toggleValue, valuesEqual } from '../src/core/compare'
+import { toggleValue, valuesEqual } from '@/core/compare'
 
 describe('valuesEqual', () => {
   it('matches identical primitives', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { filterTree, flattenTree, getLeafValues, normalizeTree, walkTree } from '../src/core/tree'
+import { filterTree, flattenTree, getLeafValues, normalizeTree, walkTree } from '@/core/tree'
 
 interface Cat {
   id: number
@@ -126,6 +126,7 @@ describe('filterTree', () => {
   it('keeps ancestors of matching leaves', () => {
     const tree = normalizeTree(sample, { optionValue: 'id', optionLabel: 'name' })
     const filtered = filterTree(tree, 'docker')
+    // Only "DevOps → Docker" survives.
     expect(filtered).toHaveLength(1)
     expect(filtered[0]?.label).toBe('DevOps')
     expect(filtered[0]?.children).toHaveLength(1)

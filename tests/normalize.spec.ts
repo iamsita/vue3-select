@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalize } from '../src/core/normalize'
+import { normalize } from '@/core/normalize'
 
 describe('normalize', () => {
   it('turns primitives into label/value pairs', () => {

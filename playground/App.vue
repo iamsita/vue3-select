@@ -214,6 +214,7 @@ header {
   line-height: 1;
 }
 footer {
+  /* max-width: 1080px; */
   margin: 60px 0 0;
   font-size: 13px;
   opacity: 0.65;

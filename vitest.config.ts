@@ -1,9 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), vueJsx()],
   test: {
     environment: 'jsdom',
     include: ['tests/**/*.spec.ts'],
@@ -11,7 +12,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      include: ['src/**/*.{ts,vue}'],
+      include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/index.ts', 'src/**/icons/*.ts'],
     },
   },

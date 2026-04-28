@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, ref } from 'vue'
-import { useDebounced } from '../src/composables/useDebounced'
+import { useDebounced } from '@/composables/useDebounced'
 
 beforeEach(() => {
   vi.useFakeTimers()
@@ -91,6 +91,7 @@ describe('useDebounced', () => {
     force('reset')
     expect(debounced.value).toBe('reset')
     vi.advanceTimersByTime(1000)
+    // Pending 'b' was cancelled — does not overwrite our forced reset.
     expect(debounced.value).toBe('reset')
   })
 
@@ -103,6 +104,7 @@ describe('useDebounced', () => {
     expect(debounced.value).toBe('a')
     delay.value = 0
     await nextTick()
+    // The reactive-delay watcher flushes whatever's pending.
     expect(debounced.value).toBe('b')
   })
 
@@ -114,6 +116,7 @@ describe('useDebounced', () => {
     await nextTick()
     scope.stop()
     vi.advanceTimersByTime(500)
+    // The disposed scope's timer was cancelled; debounced still holds 'a'.
     expect(debouncedRef.value).toBe('a')
   })
 })

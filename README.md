@@ -4,21 +4,21 @@ A typed, accessible, headless-friendly select for Vue 3.
 Single, multi, tags, async, grouped — one component, zero surprises.
 
 [![npm](https://img.shields.io/npm/v/@anilkumarthakur/vue3-select.svg)](https://www.npmjs.com/package/@anilkumarthakur/vue3-select)
-[![bundle](https://img.shields.io/badge/bundle-6.3kb%20gz-blue)](#)
+[![bundle](https://img.shields.io/badge/bundle-~10.7kb%20gz-blue)](#)
 [![types](https://img.shields.io/badge/types-included-3178c6)](#)
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 - ✅ Vue 3 + TypeScript with full generics over your option type
 - ✅ Single, multiple, and tags modes (with create-on-Enter)
-- ✅ Searchable with custom filter functions
-- ✅ Async-friendly (`@search` + `:loading`)
+- ✅ Tree variant `<VTreeSelect>` with tri-state parents, search, "select all"
+- ✅ Searchable with custom filter functions, debouncing, async loading
 - ✅ Grouped options
 - ✅ Floating-UI menu positioning + Teleport support
-- ✅ ARIA-1.2 combobox + listbox semantics, full keyboard nav
+- ✅ ARIA-1.2 combobox + listbox / treeitem semantics, full keyboard nav
 - ✅ Themeable via CSS custom properties (light / dark / preset accents)
 - ✅ Native `<form>` integration via `name` prop
 - ✅ Tree-shakeable named exports + headless composables
-- ✅ ~6.3 kB gz JS · ~2.1 kB gz CSS · zero runtime deps beyond `@floating-ui/vue`
+- ✅ ~10.7 kB gz JS · ~2.8 kB gz CSS · zero runtime deps beyond `@floating-ui/vue`
 
 ---
 
@@ -138,13 +138,111 @@ async function onSearch(q: string) {
 </VSelect>
 ```
 
+### Tree select
+
+`<VTreeSelect>` mirrors the API surface of `<VSelect>` but renders a
+hierarchy with tri-state parents. Only **leaf** values flow through v-model —
+parent state is always derived, so you never have to reconcile it manually.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { VTreeSelect } from '@anilkumarthakur/vue3-select'
+
+interface Cat { id: number; name: string; children: Cat[] }
+const categories: Cat[] = [
+  {
+    id: 1,
+    name: 'Web',
+    children: [
+      { id: 2, name: 'CSS', children: [] },
+      { id: 3, name: 'JS', children: [] },
+    ],
+  },
+  { id: 9, name: 'DevOps', children: [{ id: 10, name: 'Docker', children: [] }] },
+]
+const picked = ref<number[]>([])
+</script>
+
+<template>
+  <VTreeSelect
+    v-model="picked"
+    :options="categories"
+    option-value="id"
+    option-label="name"
+    default-expand-all
+  />
+</template>
+```
+
 ### Headless usage
 
-The composables that power `<VSelect>` are exported individually. Build your
-own UI on top:
+Every primitive that powers `<VSelect>` and `<VTreeSelect>` is exported
+individually so you can rebuild the UI surface without the bundled chrome:
 
 ```ts
-import { useSelection, useOptionFilter, useKeyboardNav, normalize } from '@anilkumarthakur/vue3-select'
+import {
+  // Selection state machines
+  useSelection,
+  useTreeSelection,
+  // Option list pipeline
+  useOptionFilter,
+  useDebounced,
+  // Combobox plumbing — same primitives the SFCs use
+  useKeyboardNav,
+  useFloatingMenu,
+  useOutsideClick,
+  useControlFocus,
+  useStableId,
+  // Core helpers (pure functions, framework-free)
+  normalize,
+  normalizeTree,
+} from '@anilkumarthakur/vue3-select'
+```
+
+## Nuxt 3 / 4
+
+`@anilkumarthakur/vue3-select` ships a first-class Nuxt module. Add it to `nuxt.config.ts`:
+
+```ts
+export default defineNuxtConfig({
+  modules: ['@anilkumarthakur/vue3-select/nuxt'],
+})
+```
+
+That's it — `<VSelect>` and `<VTreeSelect>` are auto-imported as global
+components and the stylesheet is injected. SSR is supported out of the box;
+the menu mounts to the DOM client-side via `<Teleport>` when configured.
+
+Module options live under `vue3Select`:
+
+```ts
+export default defineNuxtConfig({
+  modules: ['@anilkumarthakur/vue3-select/nuxt'],
+  vue3Select: {
+    /** Disable to keep tree-shaken named imports only. Default: true */
+    components: true,
+    /** Prefix the auto-registered tags — e.g. 'My' → <MySelect /> */
+    prefix: '',
+    /** Auto-import the headless composables too. Default: false */
+    composables: false,
+    /** Inject '@anilkumarthakur/vue3-select/style.css' into Nuxt's CSS array. Default: true */
+    css: true,
+  },
+})
+```
+
+If you'd rather skip the module and wire it up by hand, drop a Nuxt plugin
+file in `plugins/`:
+
+```ts
+// plugins/vue3-select.ts
+import { VueSelectPlugin } from '@anilkumarthakur/vue3-select'
+import '@anilkumarthakur/vue3-select/style.css'
+
+export default defineNuxtPlugin((nuxtApp) => {
+  nuxtApp.vueApp.use(VueSelectPlugin)
+})
 ```
 
 ## API
@@ -213,8 +311,23 @@ import { useSelection, useOptionFilter, useKeyboardNav, normalize } from '@anilk
 
 ```ts
 const sel = ref<VSelectInstance>()
-sel.value?.open() // close, toggle, focus, blur, clear, isOpen
+sel.value?.open() // close, toggle, focus, blur, clear, flushSearch, isOpen
 ```
+
+### `<VTreeSelect>` props (additions)
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `optionChildren` | `keyof T \| (o: T) => T[]` | `'children'` | Children-array accessor |
+| `defaultExpandAll` | `boolean` | `false` | Expand every parent on first render |
+| `showToolbar` | `boolean` | `true` | Show "select all" / "clear" actions |
+| `closeOnSelect` | `boolean` | `false` | Close after every toggle (rarely useful) |
+
+`<VTreeSelect>` shares `placeholder`, `searchable`, `clearable`, `disabled`,
+`maxSelections`, `maxVisibleTags`, `debounce`, `emptyText`, `noResultsText`,
+`size`, `theme`, `ariaLabel`, `teleportTo`, and `id` with `<VSelect>`. It
+emits `update:modelValue`, `update:search`, `select`, `deselect`, `expand`,
+`collapse`, `search`, `open`, and `close`.
 
 ## Theming
 
@@ -267,9 +380,10 @@ Modern evergreen browsers. ES2020 baseline. SSR friendly (no DOM access at modul
 ```bash
 npm install
 npm run dev          # playground at http://localhost:5173
+npm run dev -- --host 0.0.0.0 --port 5173
 npm run test         # vitest
 npm run build        # type-check + lib build → dist/
 npm run build:demo   # static playground build
 ```
 
-## Licenses
+## License
