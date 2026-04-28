@@ -20,12 +20,13 @@ export interface NormalizedOption<T = unknown> {
 }
 
 /**
- * The widest type we accept as an option. We pin it to `Record<string, any>`
- * (rather than `Record<string, unknown>`) so plain interfaces — which lack an
- * index signature — still satisfy the constraint.
+ * The widest type we accept as an option. We use plain `object` so consumer
+ * interfaces (which lack an index signature and therefore can't satisfy
+ * `Record<string, unknown>`) are still assignable, without falling back to
+ * `any`. Internally the accessors cast through `Readonly<Record<string,
+ * unknown>>` whenever they need to read a property by name.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type OptionLike = string | number | Record<string, any>
+export type OptionLike = string | number | object
 
 /** Resolves either a property name on the option or an extractor function. */
 export type OptionAccessor<T, R> = keyof T | ((option: T) => R)

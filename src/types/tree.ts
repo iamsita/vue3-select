@@ -27,12 +27,13 @@ export interface NormalizedTreeNode<T = unknown> {
 }
 
 /**
- * The widest type a tree input can be. We accept any object — the accessors
- * pull `value` / `label` / `children` out — and pin the constraint loosely
- * so plain interfaces (without an index signature) still satisfy it.
+ * The widest type a tree input can be. Plain `object` so consumer interfaces
+ * (which lack an index signature and therefore can't satisfy
+ * `Record<string, unknown>`) are still assignable, without resorting to `any`.
+ * The accessors cast through `Readonly<Record<string, unknown>>` internally
+ * whenever they need to read a property by name.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type TreeOptionLike = Record<string, any>
+export type TreeOptionLike = object
 
 /**
  * Accessor for the children array on a tree input. Default: `'children'`.

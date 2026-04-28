@@ -1,4 +1,5 @@
 import type { NormalizedOption } from '@/types/option'
+import type { NormalizedTreeNode } from '@/types/tree'
 
 export interface OptionSlotProps<T = unknown> {
   option: NormalizedOption<T>
@@ -46,4 +47,52 @@ export interface DropdownIconSlotProps {
 export interface LoaderSlotProps {
   /** Whether the loader appears inside the menu (true) or in the control (false). */
   inMenu: boolean
+}
+
+/** Aggregate map of every slot `<VSelect>` exposes — useful for typing wrappers. */
+export interface VSelectSlots<T = unknown> {
+  prefix?: () => unknown
+  suffix?: () => unknown
+  tag?: (props: TagSlotProps<T>) => unknown
+  value?: (props: ValueSlotProps<T>) => unknown
+  option?: (props: OptionSlotProps<T>) => unknown
+  optiongroup?: (props: OptionGroupSlotProps) => unknown
+  empty?: (props: EmptySlotProps) => unknown
+  loader?: (props: LoaderSlotProps) => unknown
+  dropdownicon?: (props: DropdownIconSlotProps) => unknown
+  clearicon?: (props: ClearIconSlotProps) => unknown
+  create?: (props: CreateSlotProps) => unknown
+}
+
+export interface TreeTagSlotProps<T = unknown> {
+  node: NormalizedTreeNode<T>
+  remove: () => void
+  disabled: boolean
+}
+
+export interface TreeValueSlotProps<T = unknown> {
+  selected: NormalizedTreeNode<T>[]
+}
+
+export interface TreeToolbarSlotProps {
+  selectAll: () => void
+  clear: () => void
+  selectedCount: number
+}
+
+export interface TreeEmptySlotProps {
+  query: string
+  mode: 'no-options' | 'no-results'
+}
+
+/** Aggregate map of every slot `<VTreeSelect>` exposes. */
+export interface VTreeSelectSlots<T = unknown> {
+  prefix?: () => unknown
+  suffix?: () => unknown
+  tag?: (props: TreeTagSlotProps<T>) => unknown
+  value?: (props: TreeValueSlotProps<T>) => unknown
+  toolbar?: (props: TreeToolbarSlotProps) => unknown
+  empty?: (props: TreeEmptySlotProps) => unknown
+  dropdownicon?: (props: DropdownIconSlotProps) => unknown
+  clearicon?: (props: ClearIconSlotProps) => unknown
 }

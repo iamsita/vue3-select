@@ -1,7 +1,6 @@
 import {
   computed,
   defineComponent,
-  h,
   nextTick,
   ref,
   Teleport,
@@ -18,18 +17,7 @@ import type {
   SelectSize,
   SelectTheme,
 } from '@/types/option'
-import type {
-  ClearIconSlotProps,
-  CreateSlotProps,
-  DropdownIconSlotProps,
-  EmptySlotProps,
-  LoaderSlotProps,
-  OptionGroupSlotProps,
-  OptionSlotProps,
-  TagSlotProps,
-  ValueSlotProps,
-  VSelectProps,
-} from '@/types'
+import type { OptionSlotProps, VSelectProps, VSelectSlots } from '@/types'
 import { normalize } from '@/core/normalize'
 import { useControlFocus } from '@/composables/useControlFocus'
 import { useDebounced } from '@/composables/useDebounced'
@@ -114,22 +102,7 @@ export default defineComponent({
     create: (_value: string) => true,
     search: (_query: string) => true,
   },
-  slots: Object as SlotsType<{
-    prefix?: () => unknown
-    suffix?: () => unknown
-    /** Per-tag rendering in multi/tags mode. */
-    tag?: (props: TagSlotProps<T>) => unknown
-    /** Whole-value rendering — replaces the control's value area. */
-    value?: (props: ValueSlotProps<T>) => unknown
-    option?: (props: OptionSlotProps<T>) => unknown
-    optiongroup?: (props: OptionGroupSlotProps) => unknown
-    /** Empty state — receives `mode: 'no-options' | 'no-results'`. */
-    empty?: (props: EmptySlotProps) => unknown
-    loader?: (props: LoaderSlotProps) => unknown
-    dropdownicon?: (props: DropdownIconSlotProps) => unknown
-    clearicon?: (props: ClearIconSlotProps) => unknown
-    create?: (props: CreateSlotProps) => unknown
-  }>,
+  slots: Object as SlotsType<VSelectSlots<T>>,
   setup(props, { emit, attrs, slots, expose }) {
     // Resolve once in setup — `useStableId` calls `getCurrentInstance()`, which
     // returns null inside a computed getter, so wrapping this in `computed` would
@@ -476,30 +449,23 @@ export default defineComponent({
                 {slots.optiongroup ? slots.optiongroup({ group: row.group! }) : row.group}
               </div>
             ) : (
-              // h() rather than JSX so we can pass the named-slots object
-              // conditionally — vue-jsx only detects {{...}} literal JSX
-              // children as slots, so a ternary returning the same shape is
-              // wrapped as default-slot content and the child's fallback
-              // option label never renders.
-              h(
-                VSelectOption as never,
-                {
-                  key: `o-${row.option!.id}`,
-                  option: row.option!,
-                  selected: isSelected(row.option!),
-                  active: activeIndex.value === row.index,
-                  domId: `${baseId.value}-opt-${row.option!.id}`,
-                  onHighlight: () => {
-                    activeIndex.value = row.index!
-                  },
-                  onPick: onOptionPick,
-                },
-                slots.option
-                  ? {
-                      default: (slotProps: OptionSlotProps<T>) => slots.option!(slotProps),
-                    }
-                  : undefined,
-              )
+              <VSelectOption
+                key={`o-${row.option!.id}`}
+                option={row.option!}
+                selected={isSelected(row.option!)}
+                active={activeIndex.value === row.index}
+                domId={`${baseId.value}-opt-${row.option!.id}`}
+                onHighlight={() => {
+                  activeIndex.value = row.index!
+                }}
+                onPick={onOptionPick}
+              >
+                {{
+                  default: slots.option
+                    ? (slotProps: OptionSlotProps<T>) => slots.option!(slotProps)
+                    : undefined,
+                }}
+              </VSelectOption>
             ),
           )
         )}

@@ -8,9 +8,11 @@ import {
   watch,
   withModifiers,
   type PropType,
+  type SlotsType,
 } from 'vue'
 import type { OptionAccessor, SelectSize, SelectTheme } from '@/types/option'
 import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree'
+import type { VTreeSelectSlots } from '@/types'
 import { filterTree, flattenTree, normalizeTree, walkTree } from '@/core/tree'
 import { useControlFocus } from '@/composables/useControlFocus'
 import { useDebounced } from '@/composables/useDebounced'
@@ -71,13 +73,16 @@ export default defineComponent({
     'update:search': (_value: string) => true,
     open: () => true,
     close: () => true,
+    focus: (_event: FocusEvent) => true,
+    blur: (_event: FocusEvent) => true,
     select: (_node: NormalizedTreeNode<unknown>) => true,
     deselect: (_node: NormalizedTreeNode<unknown>) => true,
     expand: (_node: NormalizedTreeNode<unknown>) => true,
     collapse: (_node: NormalizedTreeNode<unknown>) => true,
     search: (_query: string) => true,
   },
-  setup(props, { emit, attrs, expose }) {
+  slots: Object as SlotsType<VTreeSelectSlots<TreeOptionLike>>,
+  setup(props, { emit, attrs, slots, expose }) {
     const fallbackId = useStableId('vtreeselect')
     const baseId = computed(() => props.id ?? fallbackId)
     const treeId = computed(() => `${baseId.value}-tree`)
@@ -280,7 +285,11 @@ export default defineComponent({
 
     useOutsideClick({ active: isOpen, contains: [rootEl, menuEl], onOutside: close })
 
-    const { focused, onFocusIn, onFocusOut } = useControlFocus({ root: rootEl })
+    const { focused, onFocusIn, onFocusOut } = useControlFocus({
+      root: rootEl,
+      onFocus: (event) => emit('focus', event),
+      onBlur: (event) => emit('blur', event),
+    })
 
     const rootClass = computed(() => [
       'vselect',
@@ -335,34 +344,49 @@ export default defineComponent({
         aria-multiselectable={true}
         style={floatingStyles.value}
       >
-        {props.showToolbar && !isEmpty.value && (
-          <div class="vselect-tree-toolbar">
-            <span>{selectedValues.value.length} selected</span>
-            <span>
-              <button
-                type="button"
-                class="vselect-tree-toolbar-action"
-                tabindex={-1}
-                onMousedown={withModifiers(() => selectAll(), ['prevent'])}
-              >
-                Select all
-              </button>
-              {hasSelection.value && (
+        {props.showToolbar &&
+          !isEmpty.value &&
+          (slots.toolbar ? (
+            slots.toolbar({
+              selectAll,
+              clear,
+              selectedCount: selectedValues.value.length,
+            })
+          ) : (
+            <div class="vselect-tree-toolbar">
+              <span>{selectedValues.value.length} selected</span>
+              <span>
                 <button
                   type="button"
                   class="vselect-tree-toolbar-action"
                   tabindex={-1}
-                  onMousedown={withModifiers(() => clear(), ['prevent'])}
+                  onMousedown={withModifiers(() => selectAll(), ['prevent'])}
                 >
-                  Clear
+                  Select all
                 </button>
-              )}
-            </span>
-          </div>
-        )}
+                {hasSelection.value && (
+                  <button
+                    type="button"
+                    class="vselect-tree-toolbar-action"
+                    tabindex={-1}
+                    onMousedown={withModifiers(() => clear(), ['prevent'])}
+                  >
+                    Clear
+                  </button>
+                )}
+              </span>
+            </div>
+          ))}
 
         {isEmpty.value ? (
-          <div class="vselect-tree-empty">{emptyMessage.value}</div>
+          slots.empty ? (
+            slots.empty({
+              query: query.value,
+              mode: query.value ? 'no-results' : 'no-options',
+            })
+          ) : (
+            <div class="vselect-tree-empty">{emptyMessage.value}</div>
+          )
         ) : (
           filteredTree.value.map((node) => (
             <VTreeSelectNode
@@ -405,30 +429,44 @@ export default defineComponent({
           {...attrs}
           onMousedown={onControlMousedown}
         >
+          {slots.prefix?.()}
+
           <div class="vselect-values">
-            {hasSelection.value && !query.value && (
+            {slots.value && hasSelection.value && !query.value ? (
+              slots.value({ selected: selectedLeaves.value })
+            ) : hasSelection.value && !query.value ? (
               <>
-                {visibleTags.value.map((node) => (
-                  <span key={node.id} class="vselect-tag">
-                    <span class="vselect-tag-label">{node.label}</span>
-                    {!props.disabled && (
-                      <button
-                        type="button"
-                        class="vselect-tag-remove"
-                        aria-label={`Remove ${node.label}`}
-                        tabindex={-1}
-                        onMousedown={withModifiers(() => onTagRemove(node), ['prevent', 'stop'])}
-                      >
-                        <CloseIcon />
-                      </button>
-                    )}
-                  </span>
-                ))}
+                {visibleTags.value.map((node) =>
+                  slots.tag ? (
+                    <span key={node.id}>
+                      {slots.tag({
+                        node,
+                        remove: () => onTagRemove(node),
+                        disabled: props.disabled,
+                      })}
+                    </span>
+                  ) : (
+                    <span key={node.id} class="vselect-tag">
+                      <span class="vselect-tag-label">{node.label}</span>
+                      {!props.disabled && (
+                        <button
+                          type="button"
+                          class="vselect-tag-remove"
+                          aria-label={`Remove ${node.label}`}
+                          tabindex={-1}
+                          onMousedown={withModifiers(() => onTagRemove(node), ['prevent', 'stop'])}
+                        >
+                          <CloseIcon />
+                        </button>
+                      )}
+                    </span>
+                  ),
+                )}
                 {overflowTagCount.value > 0 && (
                   <span class="vselect-tag vselect-tag--overflow">+{overflowTagCount.value}</span>
                 )}
               </>
-            )}
+            ) : null}
 
             {!hasSelection.value && !query.value && (
               <span class="vselect-placeholder">{props.placeholder}</span>
@@ -454,21 +492,31 @@ export default defineComponent({
           </div>
 
           <div class="vselect-indicators">
-            {props.clearable && hasSelection.value && !props.disabled && (
-              <button
-                type="button"
-                class="vselect-indicator"
-                aria-label="Clear selection"
-                tabindex={-1}
-                onMousedown={onClearClick}
-              >
-                <CloseIcon />
-              </button>
+            {props.clearable && hasSelection.value && !props.disabled ? (
+              slots.clearicon ? (
+                slots.clearicon({ clear })
+              ) : (
+                <button
+                  type="button"
+                  class="vselect-indicator"
+                  aria-label="Clear selection"
+                  tabindex={-1}
+                  onMousedown={onClearClick}
+                >
+                  <CloseIcon />
+                </button>
+              )
+            ) : null}
+            {slots.dropdownicon ? (
+              slots.dropdownicon({ open: isOpen.value })
+            ) : (
+              <span class="vselect-indicator" aria-hidden="true">
+                <ChevronDownIcon class="vselect-chevron" />
+              </span>
             )}
-            <span class="vselect-indicator" aria-hidden="true">
-              <ChevronDownIcon class="vselect-chevron" />
-            </span>
           </div>
+
+          {slots.suffix?.()}
         </div>
 
         {isOpen.value &&
