@@ -1,6 +1,6 @@
 {
   "name": "@anilkumarthakur/vue3-select",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A typed, accessible, headless-friendly select for Vue 3. Single, multi, tags, async, grouped — one component, zero surprises.",
   "author": "Er. Anil Kumar Thakur <anilkumarthakur60@gmail.com>",
   "license": "MIT",
@@ -88,12 +88,16 @@
     "size:why": "size-limit --why",
     "format": "prettier --write --experimental-cli \"src/**/*.{ts,tsx,scss}\" \"playground/**/*.{ts,vue}\" \"tests/**/*.ts\"",
     "commitlint": "commitlint --edit",
+    "release": "commit-and-tag-version",
+    "release:dry": "commit-and-tag-version --dry-run",
+    "release:patch": "commit-and-tag-version --release-as patch",
+    "release:minor": "commit-and-tag-version --release-as minor",
+    "release:major": "commit-and-tag-version --release-as major",
     "prepublishOnly": "run-s test build",
     "prepare": "husky"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "dependencies": {
     "@floating-ui/vue": "^1.0.0"
@@ -117,6 +121,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
+    "commit-and-tag-version": "^12.7.1",
     "@nuxt/kit": "^4.4.2",
     "@nuxt/schema": "^4.4.2",
     "@size-limit/preset-small-lib": "^12.1.0",
@@ -188,5 +193,21 @@
         "@floating-ui/vue"
       ]
     }
-  ]
+  ],
+  "commit-and-tag-version": {
+    "header": "# Changelog\n\nAll notable changes to this project will be documented in this file.\n\nThe format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),\nand this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n",
+    "types": [
+      { "type": "feat", "section": "Features" },
+      { "type": "fix", "section": "Bug Fixes" },
+      { "type": "perf", "section": "Performance" },
+      { "type": "refactor", "section": "Refactors" },
+      { "type": "revert", "section": "Reverts" },
+      { "type": "docs", "section": "Documentation" },
+      { "type": "build", "hidden": true },
+      { "type": "ci", "hidden": true },
+      { "type": "chore", "hidden": true },
+      { "type": "style", "hidden": true },
+      { "type": "test", "hidden": true }
+    ]
+  }
 }
