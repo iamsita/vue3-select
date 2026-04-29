@@ -46,7 +46,36 @@ describe('<VTreeSelect>', () => {
         placeholder: 'Pick a category',
       },
     })
+    expect(wrapper.find('input.vselect-search').attributes('placeholder')).toBe('Pick a category')
+  })
+
+  it('renders the placeholder span when not searchable', () => {
+    wrapper = mount(VTreeSelect, {
+      props: {
+        options: SAMPLE,
+        optionValue: 'id',
+        optionLabel: 'name',
+        placeholder: 'Pick a category',
+        searchable: false,
+      },
+    })
     expect(wrapper.text()).toContain('Pick a category')
+  })
+
+  it('opens the tree when the chevron icon is clicked', async () => {
+    wrapper = mount(VTreeSelect, {
+      props: {
+        options: SAMPLE,
+        optionValue: 'id',
+        optionLabel: 'name',
+      },
+      attachTo: document.body,
+    })
+    const chevron = wrapper.find('.vselect-chevron')
+    expect(chevron.exists()).toBe(true)
+    await chevron.trigger('mousedown')
+    await nextTick()
+    expect(wrapper.find('[role="tree"]').exists()).toBe(true)
   })
 
   it('opens the tree on control mousedown', async () => {

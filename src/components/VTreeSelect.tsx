@@ -13,7 +13,7 @@ import {
 import type { OptionAccessor, SelectSize, SelectTheme } from '@/types/option'
 import type { NormalizedTreeNode, TreeOptionLike } from '@/types/tree-node'
 import type { VTreeSelectSlots } from '@/types'
-import { filterTree, flattenTree, normalizeTree, walkTree } from '@/core/tree'
+import { filterTree, flattenTree, getAncestorIds, normalizeTree, walkTree } from '@/core/tree'
 import { useControlFocus } from '@/composables/useControlFocus'
 import { useDebounced } from '@/composables/useDebounced'
 import { useFloatingMenu } from '@/composables/useFloatingMenu'
@@ -185,6 +185,16 @@ export default defineComponent({
       return map
     })
 
+    // Every node in the tree, keyed by id. Drives ancestor lookups when we
+    // auto-expand parent paths to selected leaves on open.
+    const nodeById = computed(() => {
+      const map = new Map<string, NormalizedTreeNode<T>>()
+      walkTree(tree.value, (n) => {
+        map.set(n.id, n)
+      })
+      return map
+    })
+
     const selectedLeaves = computed(() =>
       selectedValues.value
         .map((v) => leafByValue.value.get(v))
@@ -215,6 +225,13 @@ export default defineComponent({
       if (props.disabled || isOpen.value) return
       isOpen.value = true
       emit('open')
+      // Reveal parents of every selected leaf so the user lands on the menu
+      // already showing what's checked, instead of an apparently-empty tree.
+      for (const leaf of selectedLeaves.value) {
+        for (const id of getAncestorIds(leaf, nodeById.value)) {
+          expanded.add(id)
+        }
+      }
       nextTick(() => {
         if (props.searchable && searchEl.value) searchEl.value.focus()
         if (isFloating.value) updateFloating()
@@ -305,7 +322,10 @@ export default defineComponent({
       query,
       open,
       toggle: toggleOpen,
-      ignoreSelectors: ['.vselect-tag-remove', '.vselect-indicator'],
+      // The clear button stops propagation in `onClearClick`, so we don't need
+      // to ignore `.vselect-indicator` here — and ignoring it would also swallow
+      // chevron clicks, leaving users with no way to toggle the menu by icon.
+      ignoreSelectors: ['.vselect-tag-remove'],
     })
 
     const teleportToRef = computed(() => props.teleportTo)
@@ -544,7 +564,7 @@ export default defineComponent({
               </>
             ) : null}
 
-            {!hasSelection.value && !query.value && (
+            {!hasSelection.value && !query.value && !props.searchable && (
               <span class="vselect-placeholder">{props.placeholder}</span>
             )}
 
@@ -559,6 +579,7 @@ export default defineComponent({
                 autocapitalize="off"
                 spellcheck={false}
                 value={query.value}
+                placeholder={hasSelection.value ? undefined : props.placeholder}
                 disabled={props.disabled}
                 aria-controls={treeId.value}
                 aria-autocomplete="list"

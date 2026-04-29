@@ -227,30 +227,61 @@ export default defineComponent({
 
     useOutsideClick({ active: isOpen, contains: [rootEl, menuEl], onOutside: close })
 
+    // Pick the row to land on when the menu opens or its options refresh:
+    // prefer the user's current selection so they see *their* choice
+    // highlighted, falling back to the first enabled row.
+    function resolveDefaultActiveIndex() {
+      const visible = filtered.value
+      if (visible.length === 0) return -1
+      const selectedIdx = visible.findIndex((o) => isSelected(o) && !o.disabled)
+      if (selectedIdx !== -1) return selectedIdx
+      return visible.findIndex((o) => !o.disabled)
+    }
+
+    function scrollActiveIntoView() {
+      if (!isOpen.value || !menuEl.value) return
+      const opt = filtered.value[activeIndex.value]
+      if (!opt) return
+      const el = menuEl.value.querySelector<HTMLElement>(`[id="${baseId.value}-opt-${opt.id}"]`)
+      // jsdom (test env) and some older browsers don't implement scrollIntoView.
+      el?.scrollIntoView?.({ block: 'nearest' })
+    }
+
     watch(isOpen, (openVal) => {
       if (openVal) {
         emit('open')
         nextTick(() => {
           if (props.searchable && searchEl.value) searchEl.value.focus()
-          if (activeIndex.value === -1 && filtered.value.length > 0) {
-            activeIndex.value = filtered.value.findIndex((o) => !o.disabled)
-          }
+          if (activeIndex.value === -1) activeIndex.value = resolveDefaultActiveIndex()
           if (isFloating.value) updateFloating()
+          scrollActiveIntoView()
         })
       } else {
         emit('close')
       }
     })
 
-    // Emits + active-index reset run off the *effective* query so async consumers
-    // only see one fire per debounced change, not one per keystroke.
+    // Re-resolve the active row whenever the visible option set changes — this
+    // covers debounced query updates *and* async option arrival (where the
+    // parent populates `options` after a fetch resolves).
+    watch(
+      () => filtered.value,
+      () => {
+        if (!isOpen.value && activeIndex.value === -1) return
+        activeIndex.value = resolveDefaultActiveIndex()
+      },
+    )
+
+    // Emit search events off the *effective* query so async consumers only see
+    // one fire per debounced change, not one per keystroke.
     watch(effectiveQuery, (q) => {
       emit('update:search', q)
       emit('search', q)
-      nextTick(() => {
-        if (filtered.value.length === 0) activeIndex.value = -1
-        else activeIndex.value = filtered.value.findIndex((o) => !o.disabled)
-      })
+    })
+
+    watch(activeIndex, () => {
+      if (!isOpen.value) return
+      nextTick(scrollActiveIntoView)
     })
 
     const { onControlMousedown, onSearchInput } = useTriggerInteractions({
@@ -519,7 +550,7 @@ export default defineComponent({
               <span class="vselect-single">{selectedOptions.value[0]?.label}</span>
             ) : null}
 
-            {!hasSelection.value && !query.value && (
+            {!hasSelection.value && !query.value && !props.searchable && (
               <span class="vselect-placeholder">{props.placeholder}</span>
             )}
 
@@ -531,13 +562,14 @@ export default defineComponent({
                 }}
                 class={[
                   'vselect-search',
-                  { 'is-hidden': !isMulti.value && hasSelection.value && !isOpen.value },
+                  { 'is-hidden': !isMulti.value && hasSelection.value && !query.value },
                 ]}
                 type="text"
                 autocomplete="off"
                 autocapitalize="off"
                 spellcheck={false}
                 value={query.value}
+                placeholder={hasSelection.value ? undefined : props.placeholder}
                 disabled={props.disabled}
                 aria-controls={listboxId.value}
                 aria-autocomplete="list"

@@ -21,6 +21,13 @@ describe('<VSelect> — single mode', () => {
     wrapper = mount(VSelect, {
       props: { options: FRUITS, placeholder: 'Pick…' },
     })
+    expect(wrapper.find('input.vselect-search').attributes('placeholder')).toBe('Pick…')
+  })
+
+  it('renders the placeholder span when not searchable', () => {
+    wrapper = mount(VSelect, {
+      props: { options: FRUITS, placeholder: 'Pick…', searchable: false },
+    })
     expect(wrapper.text()).toContain('Pick…')
   })
 
@@ -33,6 +40,30 @@ describe('<VSelect> — single mode', () => {
     await open(wrapper)
     await nextTick()
     expect(wrapper.find('[role="listbox"]').exists()).toBe(true)
+  })
+
+  it('highlights the currently selected option when opening', async () => {
+    wrapper = mount(VSelect, {
+      props: { options: FRUITS, modelValue: 'Cherry' },
+      attachTo: document.body,
+    })
+    await open(wrapper)
+    await nextTick()
+    const active = wrapper.find('.vselect-option.is-active')
+    expect(active.exists()).toBe(true)
+    expect(active.text()).toContain('Cherry')
+  })
+
+  it('hides the search input when a value is selected and the user is not typing', async () => {
+    wrapper = mount(VSelect, {
+      props: { options: FRUITS, modelValue: 'Apple' },
+      attachTo: document.body,
+    })
+    await nextTick()
+    expect(wrapper.find('input.vselect-search').classes()).toContain('is-hidden')
+    await open(wrapper)
+    await nextTick()
+    expect(wrapper.find('input.vselect-search').classes()).toContain('is-hidden')
   })
 
   it('emits update:modelValue on option pick', async () => {

@@ -12,7 +12,7 @@
     color: var(--vselect-text);
     font-size: var(--vselect-font-size);
     line-height: var(--vselect-line-height);
-    cursor: text;
+    cursor: pointer;
     transition:
       border-color var(--vselect-transition),
       box-shadow var(--vselect-transition),
@@ -25,6 +25,10 @@
     .vselect.is-focused & {
       border-color: var(--vselect-border-focus);
       box-shadow: var(--vselect-focus-ring);
+    }
+
+    .vselect.is-searchable & {
+      cursor: text;
     }
 
     .vselect.is-disabled & {
@@ -73,5 +77,8 @@
     gap: 4px;
     flex-shrink: 0;
     color: var(--vselect-text-muted);
+    // Override the searchable control's text cursor so the gap between the
+    // clear/chevron buttons doesn't read as a typeable area.
+    cursor: pointer;
   }
 }
